@@ -1,0 +1,47 @@
+%% 用例图：12306旅客管理系统
+graph LR
+    %% 参与者
+    actor "普通用户" as User
+    actor "管理员" as Admin
+    actor "支付平台" as Payment
+
+    %% 用例
+    uc1["注册账号"]
+    uc2["登录系统"]
+    uc3["管理旅客"]
+    uc4["查询车次"]
+    uc5["购买车票"]
+    uc6["支付订单"]
+    uc7["查看订单"]
+    uc8["退票"]
+    uc9["改签"]
+    uc10["候补购票"]
+    uc11["设置默认旅客"]
+    uc12["查看乘车记录"]
+    uc13["管理用户"]
+    uc14["系统配置"]
+
+    %% 关系
+    User --> uc1
+    User --> uc2
+    User --> uc3
+    User --> uc4
+    User --> uc5
+    User --> uc6
+    User --> uc7
+    User --> uc8
+    User --> uc9
+    User --> uc10
+    User --> uc11
+    User --> uc12
+
+    Admin --> uc13
+    Admin --> uc14
+
+    Payment --> uc6
+
+    %% 包含关系
+    uc5 --> uc6 : <<include>>
+
+    %% 扩展关系
+    uc10 -.-> uc5 : <<extend>>

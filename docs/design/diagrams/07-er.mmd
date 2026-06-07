@@ -1,0 +1,130 @@
+%% ER图：12306旅客管理系统核心实体
+erDiagram
+    USER ||--o{ PASSENGER : "拥有"
+    USER ||--o{ ORDER : "下单"
+    USER ||--o{ WAITING_LIST : "候补"
+
+    ORDER ||--|{ ORDER_ITEM : "包含"
+    ORDER ||--o{ REFUND : "产生"
+    ORDER ||--o{ CHANGE : "产生"
+
+    ORDER_ITEM }o--|| PASSENGER : "关联"
+    ORDER_ITEM }o--|| TICKET_INVENTORY : "占用"
+
+    ORDER }o--|| TRAIN : "乘坐"
+    TRAIN ||--o{ TRAIN_STOP : "经停"
+    TRAIN ||--o{ TICKET_INVENTORY : "有"
+
+    TRAIN {
+        bigint id PK
+        string train_code UK
+        int train_type
+        bigint start_station_id FK
+        bigint end_station_id FK
+        time start_time
+        time end_time
+        int total_time
+        int status
+    }
+
+    USER {
+        bigint id PK
+        string phone UK
+        string password
+        string nickname
+        string real_name
+        string id_card
+        boolean is_verified
+        datetime verify_time
+        int status
+        datetime create_time
+    }
+
+    PASSENGER {
+        bigint id PK
+        bigint user_id FK
+        string name
+        char gender
+        date birth_date
+        string id_type
+        string id_number
+        string phone
+        string passenger_type
+        string certification_status
+        boolean is_default
+        int status
+        datetime create_time
+    }
+
+    ORDER {
+        bigint id PK
+        string order_no UK
+        bigint user_id FK
+        bigint train_id FK
+        date travel_date
+        bigint start_station_id
+        bigint end_station_id
+        int passenger_count
+        decimal total_price
+        decimal pay_price
+        datetime pay_time
+        int order_status
+        datetime create_time
+    }
+
+    ORDER_ITEM {
+        bigint id PK
+        bigint order_id FK
+        bigint passenger_id FK
+        bigint seat_type_id
+        string seat_number
+        decimal price
+        int ticket_status
+        datetime create_time
+    }
+
+    TICKET_INVENTORY {
+        bigint id PK
+        bigint train_id FK
+        date travel_date
+        bigint seat_type_id
+        int total_seats
+        int available_seats
+        int sold_seats
+        decimal price
+        int status
+    }
+
+    TRAIN_STOP {
+        bigint id PK
+        bigint train_id FK
+        bigint station_id FK
+        int stop_order
+        time arrive_time
+        time depart_time
+        int distance
+    }
+
+    WAITING_LIST {
+        bigint id PK
+        string waiting_no UK
+        bigint user_id FK
+        bigint train_id FK
+        int passenger_count
+        decimal max_price
+        int waiting_status
+        datetime expire_time
+        datetime create_time
+    }
+
+    REFUND {
+        bigint id PK
+        string refund_no UK
+        bigint order_id FK
+        bigint order_item_id FK
+        decimal original_price
+        decimal refund_fee
+        decimal refund_amount
+        datetime refund_time
+        int refund_status
+    }

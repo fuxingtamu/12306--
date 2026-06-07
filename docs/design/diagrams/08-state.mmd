@@ -1,0 +1,39 @@
+%% 状态图：订单状态流转
+stateDiagram-v2
+    [*] --> UNPAID : 创建订单
+
+    UNPAID --> PAID : 支付成功
+    UNPAID --> CANCELLED : 超时取消 / 用户取消
+    UNPAID --> TIMEOUT : 10分钟超时
+
+    PAID --> COMPLETED : 乘车完成
+    PAID --> REFUNDING : 用户申请退票
+    PAID --> CHANGING : 用户申请改签
+
+    COMPLETED --> REFUNDING : 事后退票（有限制）
+
+    REFUNDING --> REFUNDED : 退款完成
+    REFUNDING --> PAID : 退票取消
+
+    CHANGING --> CHANGED : 改签成功
+    CHANGING --> PAID : 改签取消
+
+    REFUNDED --> [*]
+    CHANGED --> [*]
+    CANCELLED --> [*]
+    TIMEOUT --> [*]
+
+    note right of UNPAID
+        等待用户支付
+        有效期10分钟
+    end note
+
+    note right of PAID
+        已支付
+        可乘车或申请退票/改签
+    end note
+
+    note right of REFUNDING
+        退票审核中
+        手续费根据时间计算
+    end note
