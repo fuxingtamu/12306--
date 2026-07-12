@@ -105,7 +105,8 @@ interface Station {
 }
 
 interface Props {
-  modelValue?: number | string  // 车站ID或名称
+  modelValue?: number | string  // v-model 绑定的值（车站ID或名称）
+  selectedId?: number | string  // 兼容 :selected-id 用法
   placeholder?: string
   showHot?: boolean
   selectorWidth?: number
@@ -118,8 +119,12 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   'update:modelValue': [value: number | string]
+  'update:selectedId': [value: number | string]
   'change': [station: Station | null]
 }>()
+
+// 统一的值：优先用 selectedId，其次 modelValue
+const currentValue = computed(() => props.selectedId ?? props.modelValue)
 
 const popoverVisible = ref(false)
 const searchKeyword = ref('')
@@ -131,21 +136,21 @@ const stationListRef = ref()
 
 // 显示文本
 const displayText = computed(() => {
-  if (props.modelValue) {
+  if (currentValue.value) {
     const station = allStations.value.find(s =>
-      s.id === props.modelValue || s.stationName === props.modelValue
+      s.id === currentValue.value || s.stationName === currentValue.value
     )
-    return station?.stationName || String(props.modelValue)
+    return station?.stationName || String(currentValue.value)
   }
   return ''
 })
 
 // 选中的ID
 const selectedId = computed(() => {
-  if (typeof props.modelValue === 'number') {
-    return props.modelValue
+  if (typeof currentValue.value === 'number') {
+    return currentValue.value
   }
-  const station = allStations.value.find(s => s.stationName === props.modelValue)
+  const station = allStations.value.find(s => s.stationName === currentValue.value)
   return station?.id
 })
 
@@ -198,6 +203,7 @@ const handleSearch = async () => {
 // 选择车站
 const handleSelectStation = (station: Station) => {
   emit('update:modelValue', station.id)
+  emit('update:selectedId', station.id)
   emit('change', station)
   popoverVisible.value = false
   searchKeyword.value = ''
@@ -207,6 +213,7 @@ const handleSelectStation = (station: Station) => {
 // 清除选择
 const handleClear = () => {
   emit('update:modelValue', '')
+  emit('update:selectedId', '')
   emit('change', null)
 }
 
