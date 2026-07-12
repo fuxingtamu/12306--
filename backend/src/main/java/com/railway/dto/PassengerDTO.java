@@ -16,8 +16,11 @@ public class PassengerDTO {
     @NotBlank(message = "证件类型不能为空")
     private String idType;
 
-    @NotBlank(message = "姓名不能为空")
-    private String name;
+    @NotBlank(message = "姓不能为空")
+    private String lastName;
+
+    @NotBlank(message = "名不能为空")
+    private String firstName;
 
     @NotBlank(message = "证件号不能为空")
     private String idCard;

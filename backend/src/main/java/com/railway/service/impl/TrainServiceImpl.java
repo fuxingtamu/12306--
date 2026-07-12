@@ -209,18 +209,26 @@ public class TrainServiceImpl extends ServiceImpl<TrainMapper, Train> implements
     }
 
     /**
-     * 查找车站
+     * 查找车站（支持按名称、编码、ID查找）
      */
     private Station findStation(String stationName) {
-        return stationMapper.selectOne(
-                new LambdaQueryWrapper<Station>()
-                        .eq(Station::getStatus, 1)
-                        .and(wrapper -> wrapper
-                                .eq(Station::getStationName, stationName)
-                                .or()
-                                .eq(Station::getStationCode, stationName.toUpperCase())
-                        )
-        );
+        LambdaQueryWrapper<Station> wrapper = new LambdaQueryWrapper<Station>()
+                .eq(Station::getStatus, 1)
+                .and(w -> w
+                        .eq(Station::getStationName, stationName)
+                        .or()
+                        .eq(Station::getStationCode, stationName.toUpperCase())
+                );
+
+        // 尝试按ID查找（前端StationSelector可能传数字ID）
+        try {
+            Long stationId = Long.parseLong(stationName);
+            wrapper = wrapper.or().eq(Station::getId, stationId);
+        } catch (NumberFormatException ignored) {
+            // 不是数字ID，忽略
+        }
+
+        return stationMapper.selectOne(wrapper);
     }
 
     /**

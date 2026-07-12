@@ -17,7 +17,11 @@
       </div>
 
       <el-table :data="passengers" v-loading="loading" stripe>
-        <el-table-column prop="name" label="姓名" />
+        <el-table-column label="姓名">
+          <template #default="{ row }">
+            {{ row.lastName + row.firstName }}
+          </template>
+        </el-table-column>
         <el-table-column prop="idCard" label="身份证号" />
         <el-table-column label="旅客类型">
           <template #default="{ row }">
@@ -48,8 +52,11 @@
     <!-- 添加/编辑旅客对话框 -->
     <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑旅客' : '添加旅客'" width="500px">
       <el-form ref="formRef" :model="passengerForm" :rules="rules" label-width="100px">
-        <el-form-item label="姓名" prop="name">
-          <el-input v-model="passengerForm.name" placeholder="请输入姓名" />
+        <el-form-item label="姓" prop="lastName">
+          <el-input v-model="passengerForm.lastName" placeholder="请输入姓" maxlength="50" />
+        </el-form-item>
+        <el-form-item label="名" prop="firstName">
+          <el-input v-model="passengerForm.firstName" placeholder="请输入名" maxlength="50" />
         </el-form-item>
         <el-form-item label="身份证号" prop="idCard">
           <el-input v-model="passengerForm.idCard" placeholder="请输入身份证号" maxlength="18" />
@@ -82,7 +89,8 @@ import type { FormInstance, FormRules } from 'element-plus'
 
 interface Passenger {
   id: number
-  name: string
+  lastName: string
+  firstName: string
   idCard: string
   passengerType: number
   phone: string
@@ -97,14 +105,16 @@ const editingId = ref<number | null>(null)
 const formRef = ref<FormInstance>()
 
 const passengerForm = ref({
-  name: '',
+  lastName: '',
+  firstName: '',
   idCard: '',
   passengerType: 1,
   phone: ''
 })
 
 const rules: FormRules = {
-  name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+  lastName: [{ required: true, message: '请输入姓', trigger: 'blur' }],
+  firstName: [{ required: true, message: '请输入名', trigger: 'blur' }],
   idCard: [
     { required: true, message: '请输入身份证号', trigger: 'blur' },
     { pattern: /^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[0-9Xx]$/, message: '身份证号格式不正确', trigger: 'blur' }
@@ -133,7 +143,8 @@ const showAddDialog = () => {
   isEdit.value = false
   editingId.value = null
   passengerForm.value = {
-    name: '',
+    lastName: '',
+    firstName: '',
     idCard: '',
     passengerType: 1,
     phone: ''
@@ -146,7 +157,8 @@ const handleEdit = (row: Passenger) => {
   isEdit.value = true
   editingId.value = row.id
   passengerForm.value = {
-    name: row.name,
+    lastName: row.lastName,
+    firstName: row.firstName,
     idCard: row.idCard,
     passengerType: row.passengerType,
     phone: row.phone || ''

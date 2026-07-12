@@ -24,7 +24,7 @@
         <div class="passenger-item current-user" @click="handleEdit(currentUser)">
           <div class="item-main">
             <div class="name-row">
-              <span class="name">{{ currentUser.name }}</span>
+              <span class="name">{{ currentUser.lastName + currentUser.firstName }}</span>
               <span :class="['type-tag', getTypeClass(currentUser.passengerType)]">
                 {{ getPassengerTypeName(currentUser.passengerType) }}
               </span>
@@ -57,7 +57,7 @@
         >
           <div class="item-main">
             <div class="name-row">
-              <span class="name">{{ passenger.name }}</span>
+              <span class="name">{{ passenger.lastName + passenger.firstName }}</span>
               <span :class="['type-tag', getTypeClass(passenger.passengerType)]">
                 {{ getPassengerTypeName(passenger.passengerType) }}
               </span>
@@ -191,16 +191,23 @@
               </svg>
             </label>
             <div class="form-control" v-if="isEdit">
-              <span>{{ passengerForm.name }}</span>
+              <span>{{ passengerForm.lastName + passengerForm.firstName }}</span>
               <span class="verified-tag">已通过</span>
             </div>
-            <el-input
-              v-else
-              v-model="passengerForm.name"
-              :placeholder="getPlaceholder('name')"
-              maxlength="50"
-              class="custom-input"
-            />
+            <div v-else class="name-inputs">
+              <el-input
+                v-model="passengerForm.lastName"
+                placeholder="姓氏"
+                maxlength="50"
+                class="custom-input name-last"
+              />
+              <el-input
+                v-model="passengerForm.firstName"
+                placeholder="名字"
+                maxlength="50"
+                class="custom-input name-first"
+              />
+            </div>
           </div>
 
           <!-- 证件号码 -->
@@ -330,7 +337,7 @@
               <li>请提供乘车人真实有效的联系方式。对于未成年人、老年人等重点旅客以及无手机的旅客，可提供监护人或能及时联系的亲友手机号码。</li>
               <li>互联网售票实行实名制，请准确填写乘车人基本信息。</li>
               <li>如旅客身份信息未能在添加后的24小时内通过核验，请乘车人持有效身份证件原件到车站办理身份核验。</li>
-              <li>乘车人在添加后30天内不允许删除，每个账号最多允许添加30个乘客。</li>
+              <li>乘车人在添加后30天内不允许删除，每个账号最多允许添加15个乘客。</li>
             </ol>
           </div>
         </el-form>
@@ -549,7 +556,8 @@ import type { FormInstance, FormRules } from 'element-plus'
 
 interface Passenger {
   id: number
-  name: string
+  lastName: string
+  firstName: string
   idType: string
   idCard: string
   passengerType: number
@@ -574,7 +582,8 @@ const editingId = ref<number | null>(null)
 const formRef = ref<FormInstance>()
 
 const passengerForm = ref({
-  name: '',
+  lastName: '',
+  firstName: '',
   idType: 'ID_CARD',
   idCard: '',
   passengerType: 1,
@@ -874,21 +883,7 @@ const showEmail = computed(() => {
   return emailIdTypes.includes(passengerForm.value.idType)
 })
 
-// 根据证件类型获取姓名占位符
-const getPlaceholder = (field: string) => {
-  const idType = passengerForm.value.idType
-  if (field === 'name') {
-    if (idType === 'FOREIGN_PASSPORT') {
-      return '外国护照按姓名顺序填写英文姓名'
-    } else if (idType === 'CHINA_PASSPORT') {
-      return '中国护照用户请填写中文姓名'
-    } else if (['HK_MACAO_PASS', 'TAIWAN_PASS'].includes(idType)) {
-      return '请输入真实姓名，以便购票'
-    }
-    return '请填写真实姓名'
-  }
-  return ''
-}
+// 根据证件类型获取姓名占位符（已改为lastName/firstName分离，不再需要）
 
 const idTypeOptions = [
   { label: '中国居民身份证', value: 'ID_CARD' },
@@ -909,9 +904,13 @@ const passengerTypeOptions = [
 ]
 
 const rules: FormRules = {
-  name: [
-    { required: true, message: '请输入乘车人姓名', trigger: 'blur' },
-    { min: 2, max: 20, message: '姓名长度为2-20个字符', trigger: 'blur' }
+  lastName: [
+    { required: true, message: '请输入姓氏', trigger: 'blur' },
+    { min: 1, max: 50, message: '姓氏长度为1-50个字符', trigger: 'blur' }
+  ],
+  firstName: [
+    { required: true, message: '请输入名字', trigger: 'blur' },
+    { min: 1, max: 50, message: '名字长度为1-50个字符', trigger: 'blur' }
   ],
   idCard: [
     { required: true, message: '请输入证件号码', trigger: 'blur' }
@@ -926,7 +925,8 @@ onMounted(() => {
 // Mock当前用户数据
 const mockCurrentUser: Passenger = {
   id: 0,
-  name: '徐明洋',
+  lastName: '徐',
+  firstName: '明洋',
   idType: 'ID_CARD',
   idCard: '411628199501011237',
   passengerType: 3,
@@ -938,34 +938,34 @@ const mockCurrentUser: Passenger = {
 // Mock乘车人列表数据 - 包含所有证件类型
 const mockPassengersList: Passenger[] = [
   // 中国居民身份证
-  { id: 1, name: '张三', idType: 'ID_CARD', idCard: '110101199001011234', passengerType: 1, phone: '13800138001', isVerified: 1, isDefault: 0 },
-  { id: 2, name: '李小红', idType: 'ID_CARD', idCard: '310101199505055678', passengerType: 2, phone: '13800138002', isVerified: 1, isDefault: 0 },
-  { id: 3, name: '王建国', idType: 'ID_CARD', idCard: '440101198806015432', passengerType: 1, phone: '13800138003', isVerified: 1, isDefault: 0 },
-  { id: 4, name: '陈思思', idType: 'ID_CARD', idCard: '510101200101013456', passengerType: 3, phone: '13800138004', isVerified: 0, isDefault: 0 },
-  { id: 5, name: '刘伟', idType: 'ID_CARD', idCard: '320101198505201234', passengerType: 4, phone: '13800138005', isVerified: 1, isDefault: 0 },
+  { id: 1, lastName: '张', firstName: '三', idType: 'ID_CARD', idCard: '110101199001011234', passengerType: 1, phone: '13800138001', isVerified: 1, isDefault: 0 },
+  { id: 2, lastName: '李', firstName: '小红', idType: 'ID_CARD', idCard: '310101199505055678', passengerType: 2, phone: '13800138002', isVerified: 1, isDefault: 0 },
+  { id: 3, lastName: '王', firstName: '建国', idType: 'ID_CARD', idCard: '440101198806015432', passengerType: 1, phone: '13800138003', isVerified: 1, isDefault: 0 },
+  { id: 4, lastName: '陈', firstName: '思思', idType: 'ID_CARD', idCard: '510101200101013456', passengerType: 3, phone: '13800138004', isVerified: 0, isDefault: 0 },
+  { id: 5, lastName: '刘', firstName: '伟', idType: 'ID_CARD', idCard: '320101198505201234', passengerType: 4, phone: '13800138005', isVerified: 1, isDefault: 0 },
 
   // 港澳居民居住证
-  { id: 6, name: '陳大文', idType: 'HK_MACAO_RESIDENCE', idCard: '830123199001011234', passengerType: 1, phone: '13912340001', nationality: '中国香港', isVerified: 1, isDefault: 0 },
+  { id: 6, lastName: '陳', firstName: '大文', idType: 'HK_MACAO_RESIDENCE', idCard: '830123199001011234', passengerType: 1, phone: '13912340001', nationality: '中国香港', isVerified: 1, isDefault: 0 },
 
   // 台湾居民居住证
-  { id: 7, name: '王小明', idType: 'TAIWAN_RESIDENCE', idCard: '830123199501015678', passengerType: 1, phone: '13912340002', nationality: '中国台湾', isVerified: 1, isDefault: 0 },
+  { id: 7, lastName: '王', firstName: '小明', idType: 'TAIWAN_RESIDENCE', idCard: '830123199501015678', passengerType: 1, phone: '13912340002', nationality: '中国台湾', isVerified: 1, isDefault: 0 },
 
   // 外国人永久居留身份证
-  { id: 8, name: 'Michael Johnson', idType: 'FOREIGN_PERMANENT', idCard: 'USA123456789012', passengerType: 1, phone: '13912340003', nationality: '美国', isVerified: 1, isDefault: 0 },
+  { id: 8, lastName: 'Johnson', firstName: 'Michael', idType: 'FOREIGN_PERMANENT', idCard: 'USA123456789012', passengerType: 1, phone: '13912340003', nationality: '美国', isVerified: 1, isDefault: 0 },
 
   // 港澳居民来往内地通行证
-  { id: 9, name: '何小美', idType: 'HK_MACAO_PASS', idCard: 'H12345678', passengerType: 1, phone: '13912340004', nationality: '中国香港', isVerified: 1, isDefault: 0 },
+  { id: 9, lastName: '何', firstName: '小美', idType: 'HK_MACAO_PASS', idCard: 'H12345678', passengerType: 1, phone: '13912340004', nationality: '中国香港', isVerified: 1, isDefault: 0 },
 
   // 台湾居民来往大陆通行证
-  { id: 10, name: '林小明', idType: 'TAIWAN_PASS', idCard: 'T12345678', passengerType: 1, phone: '13912340005', nationality: '中国台湾', isVerified: 1, isDefault: 0 },
+  { id: 10, lastName: '林', firstName: '小明', idType: 'TAIWAN_PASS', idCard: 'T12345678', passengerType: 1, phone: '13912340005', nationality: '中国台湾', isVerified: 1, isDefault: 0 },
 
   // 中国护照
-  { id: 11, name: '李明', idType: 'CHINA_PASSPORT', idCard: 'E12345678', passengerType: 1, phone: '13912340006', isVerified: 1, isDefault: 0 },
+  { id: 11, lastName: '李', firstName: '明', idType: 'CHINA_PASSPORT', idCard: 'E12345678', passengerType: 1, phone: '13912340006', isVerified: 1, isDefault: 0 },
 
   // 外国护照
-  { id: 12, name: 'John Smith', idType: 'FOREIGN_PASSPORT', idCard: 'AB1234567', passengerType: 1, phone: '13912340007', nationality: '美国', birthDate: '1990-01-01', gender: 'male', expireDate: '2030-12-31', email: 'johnsmith@email.com', isVerified: 1, isDefault: 0 },
-  { id: 13, name: '田中太郎', idType: 'FOREIGN_PASSPORT', idCard: 'JP9876543', passengerType: 1, phone: '13912340008', nationality: '日本', isVerified: 1, isDefault: 0 },
-  { id: 14, name: 'Maria Garcia', idType: 'FOREIGN_PASSPORT', idCard: 'ES2468135', passengerType: 1, phone: '13912340009', nationality: '西班牙', isVerified: 1, isDefault: 0 },
+  { id: 12, lastName: 'Smith', firstName: 'John', idType: 'FOREIGN_PASSPORT', idCard: 'AB1234567', passengerType: 1, phone: '13912340007', nationality: '美国', birthDate: '1990-01-01', gender: 'male', expireDate: '2030-12-31', email: 'johnsmith@email.com', isVerified: 1, isDefault: 0 },
+  { id: 13, lastName: '田中', firstName: '太郎', idType: 'FOREIGN_PASSPORT', idCard: 'JP9876543', passengerType: 1, phone: '13912340008', nationality: '日本', isVerified: 1, isDefault: 0 },
+  { id: 14, lastName: 'Garcia', firstName: 'Maria', idType: 'FOREIGN_PASSPORT', idCard: 'ES2468135', passengerType: 1, phone: '13912340009', nationality: '西班牙', isVerified: 1, isDefault: 0 },
 ]
 
 let mockId = 15
@@ -986,13 +986,13 @@ const loadPassengers = async () => {
 
 const groupedPassengers = computed(() => {
   const groups: { letter: string; list: Passenger[] }[] = []
-  const sorted = [...passengers.value].sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'))
+  const sorted = [...passengers.value].sort((a, b) => (a.lastName + a.firstName).localeCompare(b.lastName + b.firstName, 'zh-CN'))
 
   let currentLetter = ''
   let currentList: Passenger[] = []
 
   sorted.forEach(p => {
-    const letter = p.name.charAt(0).toUpperCase()
+    const letter = (p.lastName + p.firstName).charAt(0).toUpperCase()
     if (letter !== currentLetter) {
       if (currentList.length > 0) {
         groups.push({ letter: currentLetter, list: currentList })
@@ -1019,7 +1019,8 @@ const showAddDialog = () => {
   isEdit.value = false
   editingId.value = null
   passengerForm.value = {
-    name: '',
+    lastName: '',
+  firstName: '',
     idType: 'ID_CARD',
     idCard: '',
     passengerType: 1,
@@ -1037,7 +1038,8 @@ const handleEdit = (row: Passenger) => {
   isEdit.value = true
   editingId.value = row.id
   passengerForm.value = {
-    name: row.name,
+    lastName: row.lastName,
+    firstName: row.firstName,
     idType: row.idType || 'ID_CARD',
     idCard: row.idCard,
     passengerType: row.passengerType,
@@ -1053,7 +1055,7 @@ const handleEdit = (row: Passenger) => {
 
 const handleDelete = async (row: Passenger) => {
   try {
-    await ElMessageBox.confirm(`确定要删除乘车人"${row.name}"吗？`, '提示', { type: 'warning' })
+    await ElMessageBox.confirm(`确定要删除乘车人"${row.lastName + row.firstName}"吗？`, '提示', { type: 'warning' })
     // Mock删除
     passengers.value = passengers.value.filter(p => p.id !== row.id)
     ElMessage.success('删除成功')
@@ -1065,7 +1067,7 @@ const handleDelete = async (row: Passenger) => {
 const handleDeleteConfirm = async () => {
   if (!editingId.value) return
   try {
-    await ElMessageBox.confirm(`确定要删除乘车人"${passengerForm.value.name}"吗？`, '提示', { type: 'warning' })
+    await ElMessageBox.confirm(`确定要删除乘车人"${passengerForm.value.lastName + passengerForm.value.firstName}"吗？`, '提示', { type: 'warning' })
     // Mock删除
     passengers.value = passengers.value.filter(p => p.id !== editingId.value)
     dialogVisible.value = false
@@ -1088,7 +1090,8 @@ const handleSubmit = async () => {
       if (idx !== -1) {
         passengers.value[idx] = {
           ...passengers.value[idx],
-          name: passengerForm.value.name,
+          lastName: passengerForm.value.lastName,
+          firstName: passengerForm.value.firstName,
           idType: passengerForm.value.idType,
           idCard: passengerForm.value.idCard,
           passengerType: passengerForm.value.passengerType,

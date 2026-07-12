@@ -29,7 +29,7 @@
         <div class="page-header">
           <div class="header-left">
             <h1 class="page-title">常用联系人</h1>
-            <span class="page-tip">最多可添加8位常用联系人</span>
+            <span class="page-tip">最多可添加15位常用联系人</span>
           </div>
           <el-button type="primary" size="large" @click="showAddDialog">
             <span class="btn-icon">+</span> 添加旅客
@@ -69,11 +69,11 @@
             >
               <div class="card-top">
                 <div class="passenger-avatar">
-                  <span>{{ p.name.charAt(0) }}</span>
+                  <span>{{ (p.lastName + p.firstName).charAt(0) }}</span>
                 </div>
                 <div class="passenger-info">
                   <div class="passenger-name">
-                    {{ p.name }}
+                    {{ p.lastName + p.firstName }}
                     <span v-if="p.isDefault" class="default-tag">默认</span>
                   </div>
                   <div class="passenger-type" :class="`type-${p.passengerType}`">
@@ -117,8 +117,12 @@
       class="passenger-dialog"
     >
       <el-form ref="formRef" :model="passengerForm" :rules="rules" label-width="80px">
-        <el-form-item label="旅客姓名" prop="name">
-          <el-input v-model="passengerForm.name" placeholder="请输入旅客姓名" maxlength="20" />
+        <el-form-item label="姓" prop="lastName">
+          <el-input v-model="passengerForm.lastName" placeholder="请输入姓" maxlength="50" />
+        </el-form-item>
+
+        <el-form-item label="名" prop="firstName">
+          <el-input v-model="passengerForm.firstName" placeholder="请输入名" maxlength="50" />
         </el-form-item>
 
         <el-form-item label="证件类型" prop="idType">
@@ -166,7 +170,8 @@ import type { FormInstance, FormRules } from 'element-plus'
 
 interface Passenger {
   id: number
-  name: string
+  lastName: string
+  firstName: string
   idCard: string
   passengerType: number
   phone: string
@@ -185,7 +190,8 @@ const formRef = ref<FormInstance>()
 const typeNames: Record<number, string> = { 1: '成人', 2: '儿童', 3: '学生', 4: '残疾军人' }
 
 const passengerForm = ref({
-  name: '',
+  lastName: '',
+  firstName: '',
   idType: 'ID_CARD',
   idCard: '',
   passengerType: 1,
@@ -193,9 +199,13 @@ const passengerForm = ref({
 })
 
 const rules: FormRules = {
-  name: [
-    { required: true, message: '请输入旅客姓名', trigger: 'blur' },
-    { min: 2, max: 20, message: '姓名长度为2-20个字符', trigger: 'blur' }
+  lastName: [
+    { required: true, message: '请输入姓', trigger: 'blur' },
+    { min: 1, max: 50, message: '姓长度为1-50个字符', trigger: 'blur' }
+  ],
+  firstName: [
+    { required: true, message: '请输入名', trigger: 'blur' },
+    { min: 1, max: 50, message: '名长度为1-50个字符', trigger: 'blur' }
   ],
   idCard: [
     { required: true, message: '请输入证件号码', trigger: 'blur' }
@@ -204,9 +214,9 @@ const rules: FormRules = {
 
 // Mock数据
 const mockPassengers: Passenger[] = [
-  { id: 1, name: '张三', idCard: '110101199001011234', passengerType: 1, phone: '13800138001', isVerified: 1, isDefault: 1 },
-  { id: 2, name: '李小红', idCard: '310101199505055678', passengerType: 2, phone: '13800138002', isVerified: 1, isDefault: 0 },
-  { id: 3, name: '王明', idCard: '440101200001011234', passengerType: 3, phone: '13800138003', isVerified: 0, isDefault: 0 },
+  { id: 1, lastName: '张', firstName: '三', idCard: '110101199001011234', passengerType: 1, phone: '13800138001', isVerified: 1, isDefault: 1 },
+  { id: 2, lastName: '李', firstName: '小红', idCard: '310101199505055678', passengerType: 2, phone: '13800138002', isVerified: 1, isDefault: 0 },
+  { id: 3, lastName: '王', firstName: '明', idCard: '440101200001011234', passengerType: 3, phone: '13800138003', isVerified: 0, isDefault: 0 },
 ]
 
 let mockId = 4
@@ -226,7 +236,7 @@ const loadPassengers = async () => {
 const showAddDialog = () => {
   isEdit.value = false
   editingId.value = null
-  passengerForm.value = { name: '', idType: 'ID_CARD', idCard: '', passengerType: 1, phone: '' }
+  passengerForm.value = { lastName: '', firstName: '', idType: 'ID_CARD', idCard: '', passengerType: 1, phone: '' }
   dialogVisible.value = true
 }
 
@@ -234,7 +244,8 @@ const handleEdit = (row: Passenger) => {
   isEdit.value = true
   editingId.value = row.id
   passengerForm.value = {
-    name: row.name,
+    lastName: row.lastName,
+    firstName: row.firstName,
     idType: 'ID_CARD',
     idCard: row.idCard,
     passengerType: row.passengerType,
@@ -245,7 +256,7 @@ const handleEdit = (row: Passenger) => {
 
 const handleDelete = async (row: Passenger) => {
   try {
-    await ElMessageBox.confirm(`确定要删除旅客"${row.name}"吗？`, '提示', { type: 'warning' })
+    await ElMessageBox.confirm(`确定要删除旅客"${row.lastName + row.firstName}"吗？`, '提示', { type: 'warning' })
     // Mock删除
     passengers.value = passengers.value.filter(p => p.id !== row.id)
     ElMessage.success('删除成功')
@@ -272,7 +283,8 @@ const handleSubmit = async () => {
       // Mock添加
       const newPassenger: Passenger = {
         id: mockId++,
-        name: passengerForm.value.name,
+        lastName: passengerForm.value.lastName,
+        firstName: passengerForm.value.firstName,
         idCard: passengerForm.value.idCard,
         passengerType: passengerForm.value.passengerType,
         phone: passengerForm.value.phone,

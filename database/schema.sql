@@ -33,7 +33,8 @@ DROP TABLE IF EXISTS passengers;
 CREATE TABLE passengers (
     id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '旅客ID',
     user_id BIGINT NOT NULL COMMENT '所属用户ID',
-    name VARCHAR(50) NOT NULL COMMENT '姓名',
+    last_name VARCHAR(50) NOT NULL COMMENT '姓',
+    first_name VARCHAR(50) NOT NULL COMMENT '名',
     id_type VARCHAR(50) NOT NULL COMMENT '证件类型',
     id_card VARCHAR(30) NOT NULL COMMENT '证件号码',
     passenger_type TINYINT NOT NULL DEFAULT 1 COMMENT '旅客类型 1-成人 2-儿童 3-学生 4-残军',

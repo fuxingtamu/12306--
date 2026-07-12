@@ -44,7 +44,20 @@ service.interceptors.response.use(
     return res
   },
   (error) => {
-    ElMessage.error(error.message || '网络错误')
+    if (error.response) {
+      const status = error.response.status
+      if (status === 401 || status === 403) {
+        // token过期或未登录，清除本地状态并跳转到登录页
+        localStorage.removeItem('token')
+        localStorage.removeItem('userInfo')
+        ElMessage.warning('登录已过期，请重新登录')
+        router.push('/login')
+        return Promise.reject(error)
+      }
+      ElMessage.error(error.response.data?.message || `请求失败 (${status})`)
+    } else {
+      ElMessage.error('网络错误，请检查网络连接')
+    }
     return Promise.reject(error)
   }
 )

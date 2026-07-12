@@ -36,7 +36,9 @@ export const passengerApi = {
   },
   // 添加旅客
   add(data: {
-    name: string
+    lastName: string
+    firstName: string
+    idType: string
     idCard: string
     passengerType?: number
     phone?: string

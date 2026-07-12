@@ -96,7 +96,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             item.setOrderId(order.getId());
             item.setOrderNo(order.getOrderNo());
             item.setPassengerId(passenger.getId());
-            item.setPassengerName(passenger.getName());
+            item.setPassengerName(passenger.getLastName() + passenger.getFirstName());
             item.setPassengerIdCard(passenger.getIdCard());
             item.setPassengerType(passenger.getPassengerType());
             item.setSeatTypeName("二等座"); // 模拟

@@ -5,6 +5,7 @@ import com.railway.common.IdType;
 import com.railway.dto.PassengerDTO;
 import com.railway.entity.Passenger;
 import com.railway.mapper.PassengerMapper;
+import com.railway.service.PassengerPrivacyService;
 import com.railway.service.PassengerService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,8 +22,14 @@ import java.util.regex.Pattern;
 @Service
 public class PassengerServiceImpl extends ServiceImpl<PassengerMapper, Passenger> implements PassengerService {
 
+    private final PassengerPrivacyService privacyService;
+
+    public PassengerServiceImpl(PassengerPrivacyService privacyService) {
+        this.privacyService = privacyService;
+    }
+
     /** 旅客最大数量 */
-    private static final int MAX_PASSENGER_COUNT = 30;
+    private static final int MAX_PASSENGER_COUNT = 15;
 
     /** 删除冷却期天数 */
     private static final int DELETE_COOLDOWN_DAYS = 30;
@@ -47,12 +54,15 @@ public class PassengerServiceImpl extends ServiceImpl<PassengerMapper, Passenger
 
     @Override
     public List<Passenger> getPassengerList(Long userId) {
-        return this.lambdaQuery()
+        List<Passenger> passengers = this.lambdaQuery()
                 .eq(Passenger::getUserId, userId)
                 .eq(Passenger::getStatus, 1)
                 .orderByDesc(Passenger::getIsDefault)
                 .orderByDesc(Passenger::getCreateTime)
                 .list();
+
+        passengers.forEach(this::maskPassenger);
+        return passengers;
     }
 
     @Override
@@ -79,14 +89,14 @@ public class PassengerServiceImpl extends ServiceImpl<PassengerMapper, Passenger
             throw new RuntimeException("该证件号已添加为旅客");
         }
 
-        // 检查旅客数量限制（最多30人）
+        // 检查旅客数量限制（最多15人）
         long count = this.lambdaQuery()
                 .eq(Passenger::getUserId, userId)
                 .eq(Passenger::getStatus, 1)
                 .count();
 
         if (count >= MAX_PASSENGER_COUNT) {
-            throw new RuntimeException("每个账号最多允许添加30个乘客");
+            throw new RuntimeException("每个账号最多允许添加15个乘客");
         }
 
         // 如果是第一个旅客，设为默认
@@ -96,7 +106,8 @@ public class PassengerServiceImpl extends ServiceImpl<PassengerMapper, Passenger
         Passenger passenger = new Passenger();
         passenger.setUserId(userId);
         passenger.setIdType(idType);
-        passenger.setName(passengerDTO.getName());
+        passenger.setLastName(passengerDTO.getLastName());
+        passenger.setFirstName(passengerDTO.getFirstName());
         passenger.setIdCard(passengerDTO.getIdCard());
         passenger.setPassengerType(passengerDTO.getPassengerType() != null ? passengerDTO.getPassengerType() : 1);
         passenger.setPhone(passengerDTO.getPhone());
@@ -137,6 +148,7 @@ public class PassengerServiceImpl extends ServiceImpl<PassengerMapper, Passenger
         passenger.setUpdateTime(LocalDateTime.now());
 
         this.save(passenger);
+        maskPassenger(passenger);
         return passenger;
     }
 
@@ -154,7 +166,8 @@ public class PassengerServiceImpl extends ServiceImpl<PassengerMapper, Passenger
         }
 
         // 更新旅客信息（证件类型和证件号不可修改）
-        passenger.setName(passengerDTO.getName());
+        passenger.setLastName(passengerDTO.getLastName());
+        passenger.setFirstName(passengerDTO.getFirstName());
         passenger.setPassengerType(passengerDTO.getPassengerType());
         passenger.setPhone(passengerDTO.getPhone());
         passenger.setNationality(passengerDTO.getNationality());
@@ -169,6 +182,7 @@ public class PassengerServiceImpl extends ServiceImpl<PassengerMapper, Passenger
         passenger.setUpdateTime(LocalDateTime.now());
 
         this.updateById(passenger);
+        maskPassenger(passenger);
         return passenger;
     }
 
@@ -209,6 +223,7 @@ public class PassengerServiceImpl extends ServiceImpl<PassengerMapper, Passenger
             throw new RuntimeException("旅客不存在");
         }
 
+        maskPassenger(passenger);
         return passenger;
     }
 
@@ -325,5 +340,13 @@ public class PassengerServiceImpl extends ServiceImpl<PassengerMapper, Passenger
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * 对旅客信息进行脱敏处理
+     */
+    private void maskPassenger(Passenger passenger) {
+        passenger.setIdCard(privacyService.maskIdCardNo(passenger.getIdType(), passenger.getIdCard()));
+        passenger.setPhone(privacyService.maskPhone(passenger.getPhone()));
     }
 }

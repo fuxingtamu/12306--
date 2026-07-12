@@ -255,8 +255,9 @@ const handleQuery = async () => {
       onlyHighSpeed: queryForm.value.onlyHighSpeed
     })
     trains.value = res.data
-  } catch (error) {
-    console.error('查询失败')
+  } catch (error: any) {
+    // 响应拦截器已显示错误提示，这里额外记录详情
+    console.error('查询车次失败:', error)
   } finally {
     loading.value = false
   }

@@ -23,8 +23,11 @@ public class Passenger implements Serializable {
     /** 所属用户ID */
     private Long userId;
 
-    /** 姓名 */
-    private String name;
+    /** 姓 */
+    private String lastName;
+
+    /** 名 */
+    private String firstName;
 
     /** 证件类型 */
     private String idType;
