@@ -138,7 +138,7 @@ const stationListRef = ref()
 const displayText = computed(() => {
   if (currentValue.value) {
     const station = allStations.value.find(s =>
-      s.id === currentValue.value || s.stationName === currentValue.value
+      s.id == currentValue.value || s.stationName === currentValue.value || s.stationCode === currentValue.value
     )
     return station?.stationName || String(currentValue.value)
   }
@@ -147,10 +147,9 @@ const displayText = computed(() => {
 
 // 选中的ID
 const selectedId = computed(() => {
-  if (typeof currentValue.value === 'number') {
-    return currentValue.value
-  }
-  const station = allStations.value.find(s => s.stationName === currentValue.value)
+  const station = allStations.value.find(s =>
+    s.id == currentValue.value || s.stationName === currentValue.value || s.stationCode === currentValue.value
+  )
   return station?.id
 })
 
