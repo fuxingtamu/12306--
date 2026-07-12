@@ -17,7 +17,7 @@
           <span class="input-label">出发地</span>
           <input type="text" v-model="queryForm.startStationName" placeholder="请输入出发站" />
         </div>
-        <button class="swap-btn">↔</button>
+        <button class="swap-btn" @click="handleSwap">↔</button>
         <div class="input-group">
           <span class="input-label">目的地</span>
           <input type="text" v-model="queryForm.endStationName" placeholder="请输入到达站" />
@@ -36,7 +36,7 @@
           <input type="radio" name="passengerType" value="student" />
           <span>学生</span>
         </label>
-        <button class="query-btn">查询</button>
+        <button class="query-btn" @click="handleQuery">查询</button>
       </div>
     </div>
 
@@ -399,15 +399,15 @@ onMounted(() => {
 })
 
 const handleQuery = async () => {
-  if (!queryForm.value.startStationName || !queryForm.value.endStationName || !selectedDate.value) {
+  if (!queryForm.value.startStation || !queryForm.value.endStation || !selectedDate.value) {
     console.warn('查询条件不完整:', queryForm.value, selectedDate.value)
     return
   }
   loading.value = true
   try {
     const res = await trainApi.query({
-      startStation: queryForm.value.startStationName,
-      endStation: queryForm.value.endStationName,
+      startStation: queryForm.value.startStation,
+      endStation: queryForm.value.endStation,
       travelDate: selectedDate.value
     })
     trains.value = res.data
@@ -416,6 +416,12 @@ const handleQuery = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const handleSwap = () => {
+  const temp = queryForm.value.startStationName
+  queryForm.value.startStationName = queryForm.value.endStationName
+  queryForm.value.endStationName = temp
 }
 </script>
 
