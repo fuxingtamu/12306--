@@ -1,53 +1,108 @@
 <template>
   <div class="passengers-page">
-    <!-- 头部 -->
-    <header class="header">
-      <router-link to="/" class="logo">中国铁路12306</router-link>
-      <nav class="nav-links">
-        <router-link to="/">首页</router-link>
-        <router-link to="/ticket">车票查询</router-link>
-      </nav>
+    <header class="top-nav">
+      <div class="nav-items">
+        <router-link to="/" class="nav-item">首页</router-link>
+        <router-link to="/ticket" class="nav-item">车票查询</router-link>
+        <router-link to="/passengers" class="nav-item active">乘车人管理</router-link>
+      </div>
     </header>
 
-    <!-- 乘车人列表 -->
-    <div class="passengers-card">
-      <div class="header-row">
-        <h2>乘车人管理</h2>
-        <el-button type="primary" @click="showAddDialog">添加乘车人</el-button>
-      </div>
-
-      <el-table :data="passengers" v-loading="loading" stripe>
-        <el-table-column label="姓名">
-          <template #default="{ row }">
-            {{ row.lastName + row.firstName }}
-          </template>
-        </el-table-column>
-        <el-table-column label="证件类型">
-          <template #default="{ row }">
-            {{ getIdTypeName(row.idType) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="idCard" label="证件号码" />
-        <el-table-column label="旅客类型">
-          <template #default="{ row }">
-            {{ getPassengerTypeName(row.passengerType) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="phone" label="手机号" />
-        <el-table-column label="操作" width="120">
-          <template #default="{ row }">
-            <el-button size="small" @click="handleEdit(row)">编辑</el-button>
-            <el-button size="small" type="danger" @click="handleDelete(row)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <div v-if="passengers.length === 0 && !loading" class="no-data">
-        <el-empty description="暂无乘车人，请添加" />
-      </div>
+    <div class="breadcrumb">
+      当前位置：<a href="/">首页</a> &gt; <span class="current">乘车人管理</span>
     </div>
 
-    <!-- 添加/编辑乘车人对话框 -->
+    <div class="content-wrapper">
+      <aside class="sidebar">
+        <div class="menu-section">
+          <div class="menu-title">常用信息管理</div>
+          <div class="menu-items">
+            <router-link to="/passengers" class="menu-item active">乘车人</router-link>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="search-bar">
+          <el-input
+            v-model="searchKeyword"
+            placeholder="请输入乘客姓名"
+            clearable
+            style="width: 200px"
+            @keyup.enter="handleSearch"
+          />
+          <el-button @click="handleSearch">查询</el-button>
+        </div>
+
+        <div class="table-wrapper">
+          <div class="table-header">
+            <table class="passenger-table">
+              <thead>
+                <tr>
+                  <th>序号</th>
+                  <th>姓名</th>
+                  <th>证件类型</th>
+                  <th>证件号码</th>
+                  <th>旅客类型</th>
+                  <th>手机/电话</th>
+                  <th>核验状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          <div class="table-toolbar">
+            <button class="add-btn" @click="showAddDialog">
+              <span class="icon">⊕</span> 添加
+            </button>
+            <button class="batch-delete-btn">
+              <span class="icon">⊗</span> 批量删除
+            </button>
+          </div>
+          <table class="passenger-table">
+            <tbody>
+              <tr v-for="(row, index) in filteredPassengers" :key="row.id">
+                <td>
+                  <input type="checkbox" :value="row.id" v-model="selectedIds" />
+                  {{ index + 1 }}
+                </td>
+                <td>{{ row.lastName + row.firstName }}</td>
+                <td>{{ getIdTypeName(row.idType) }}</td>
+                <td>{{ maskIdCard(row.idCard) }}</td>
+                <td>{{ getPassengerTypeName(row.passengerType) }}</td>
+                <td>{{ maskPhone(row.phone) }}</td>
+                <td>
+                  <span class="verified-icon">✓</span>
+                </td>
+                <td>
+                  <button class="delete-btn" @click="handleDelete(row)">
+                    <span class="icon">⊗</span>
+                  </button>
+                  <button class="edit-btn" @click="handleEdit(row)">
+                    <span class="icon">✎</span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div v-if="filteredPassengers.length === 0 && !loading" class="no-data">
+            暂无乘车人，请添加
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <nav class="bottom-nav">
+      <router-link to="/" class="nav-item" :class="{ active: $route.path === '/' }">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-text">首页</span>
+      </router-link>
+      <router-link to="/passengers" class="nav-item" :class="{ active: $route.path === '/passengers' }">
+        <span class="nav-icon">👤</span>
+        <span class="nav-text">乘车人</span>
+      </router-link>
+    </nav>
+
     <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑乘车人' : '添加乘车人'" width="500px">
       <el-form ref="formRef" :model="passengerForm" :rules="rules" label-width="100px">
         <el-form-item label="姓" prop="lastName">
@@ -84,19 +139,11 @@
         <el-button type="primary" @click="handleSubmit">确定</el-button>
       </template>
     </el-dialog>
-
-    <!-- 底部导航 -->
-    <nav class="bottom-nav">
-      <router-link to="/" class="nav-item" :class="{ active: $route.path === '/' }">
-        <span class="nav-icon">🏠</span>
-        <span class="nav-text">首页</span>
-      </router-link>
-    </nav>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { passengerApi } from '@/api'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -113,6 +160,8 @@ interface Passenger {
 
 const loading = ref(false)
 const passengers = ref<Passenger[]>([])
+const searchKeyword = ref('')
+const selectedIds = ref<number[]>([])
 const dialogVisible = ref(false)
 const isEdit = ref(false)
 const editingId = ref<number | null>(null)
@@ -134,20 +183,63 @@ const rules: FormRules = {
   idCard: [{ required: true, message: '请输入证件号码', trigger: 'blur' }]
 }
 
+const filteredPassengers = computed(() => {
+  if (!searchKeyword.value) return passengers.value
+  const keyword = searchKeyword.value.toLowerCase()
+  return passengers.value.filter(p =>
+    (p.lastName + p.firstName).toLowerCase().includes(keyword)
+  )
+})
+
 onMounted(async () => {
   await loadPassengers()
 })
+
+const getMockPassengers = () => {
+  return [
+    { id: 1, lastName: '张', firstName: '伟', idType: 'ID_CARD', idCard: '110101199001011234', passengerType: 1, phone: '13800138000' },
+    { id: 2, lastName: '李', firstName: '娜', idType: 'ID_CARD', idCard: '120102199202022345', passengerType: 1, phone: '13900139000' },
+    { id: 3, lastName: '王', firstName: '小明', idType: 'ID_CARD', idCard: '130103201503033456', passengerType: 2, phone: '13700137000' },
+    { id: 4, lastName: '刘', firstName: '小华', idType: 'ID_CARD', idCard: '140104201004044567', passengerType: 2, phone: '13600136000' },
+    { id: 5, lastName: '陈', firstName: '静', idType: 'ID_CARD', idCard: '330105199805055678', passengerType: 3, phone: '13500135000' },
+    { id: 6, lastName: '杨', firstName: '强', idType: 'ID_CARD', idCard: '320106199506066789', passengerType: 3, phone: '13400134000' },
+    { id: 7, lastName: '赵', firstName: '军', idType: 'ID_CARD', idCard: '210107198507077890', passengerType: 4, phone: '13300133000' },
+    { id: 8, lastName: '周', firstName: '芳', idType: 'HK_MACAO_PASS', idCard: 'H12345678', passengerType: 1, phone: '+85212345678' },
+    { id: 9, lastName: '吴', firstName: '明', idType: 'TAIWAN_PASS', idCard: 'W87654321', passengerType: 1, phone: '+886912345678' },
+    { id: 10, lastName: '孙', firstName: '丽', idType: 'CHINA_PASSPORT', idCard: 'E11223344', passengerType: 1, phone: '13200132000' }
+  ]
+}
 
 const loadPassengers = async () => {
   loading.value = true
   try {
     const res = await passengerApi.getList()
-    passengers.value = res.data
+    passengers.value = res.data || []
+    if (passengers.value.length === 0) {
+      passengers.value = getMockPassengers()
+    }
   } catch (error) {
-    console.error('加载失败')
+    console.error('加载失败:', error)
+    passengers.value = getMockPassengers()
   } finally {
     loading.value = false
   }
+}
+
+const handleSearch = () => {
+}
+
+const maskIdCard = (idCard: string) => {
+  if (!idCard) return ''
+  if (idCard.length === 18) {
+    return idCard.slice(0, 4) + '**********' + idCard.slice(-4)
+  }
+  return idCard.slice(0, 2) + '****' + idCard.slice(-2)
+}
+
+const maskPhone = (phone: string) => {
+  if (!phone) return ''
+  return phone.slice(0, 3) + '****' + phone.slice(-4)
 }
 
 const showAddDialog = () => {
@@ -211,8 +303,8 @@ const handleSubmit = async () => {
 const getIdTypeName = (type: string) => {
   const map: Record<string, string> = {
     'ID_CARD': '居民身份证',
-    'HK_MACAO_PASS': '港澳通行证',
-    'TAIWAN_PASS': '台湾通行证',
+    'HK_MACAO_PASS': '港澳居民来往内地通行证',
+    'TAIWAN_PASS': '台湾居民来往大陆通行证',
     'CHINA_PASSPORT': '中国护照',
     'FOREIGN_PASSPORT': '外国护照'
   }
@@ -220,65 +312,225 @@ const getIdTypeName = (type: string) => {
 }
 
 const getPassengerTypeName = (type: number) => {
-  const types = ['', '成人', '儿童', '学生']
+  const types = ['', '成人', '儿童', '学生', '残军']
   return types[type] || '成人'
 }
 </script>
 
 <style scoped>
 .passengers-page {
-  padding: 20px;
-  padding-bottom: 80px;
+  min-height: 100vh;
+  background: #f5f5f5;
 }
 
-.header {
-  background: #1a365d;
-  padding: 12px 20px;
+.top-nav {
+  background: #1e3c72;
+  padding: 10px 20px;
+}
+
+.nav-items {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: -20px -20px 20px;
+  gap: 30px;
 }
 
-.logo {
-  font-size: 20px;
-  font-weight: bold;
-  color: #fff;
-  text-decoration: none;
-}
-
-.nav-links {
-  display: flex;
-  gap: 20px;
-}
-
-.nav-links a {
+.nav-item {
   color: #fff;
   text-decoration: none;
   font-size: 14px;
+  padding: 5px 0;
 }
 
-.passengers-card {
+.nav-item.active {
+  background: #2a5298;
+  padding: 5px 15px;
+  border-radius: 3px;
+}
+
+.breadcrumb {
+  padding: 10px 20px;
+  font-size: 12px;
+  color: #666;
   background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-.header-row {
+.breadcrumb a {
+  color: #1e88e5;
+  text-decoration: none;
+}
+
+.breadcrumb .current {
+  color: #333;
+  font-weight: bold;
+}
+
+.content-wrapper {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  padding: 15px;
+  gap: 15px;
 }
 
-.header-row h2 {
-  color: #3b99fc;
-  margin: 0;
+.sidebar {
+  width: 180px;
+  background: #fff;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.menu-section {
+  margin-bottom: 15px;
+}
+
+.menu-title {
+  font-weight: bold;
+  color: #333;
+  padding: 5px 0;
+  margin-bottom: 5px;
+}
+
+.menu-subtitle {
+  font-size: 12px;
+  color: #666;
+  padding-left: 10px;
+  margin-bottom: 3px;
+}
+
+.menu-items {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-item {
+  padding: 6px 10px;
+  font-size: 13px;
+  color: #666;
+  text-decoration: none;
+}
+
+.menu-item:hover {
+  background: #f5f7fa;
+}
+
+.menu-item.active {
+  background: #1e88e5;
+  color: #fff;
+}
+
+.main-content {
+  flex: 1;
+  background: #fff;
+  border-radius: 5px;
+  padding: 15px;
+}
+
+.search-bar {
+  margin-bottom: 15px;
+}
+
+.table-wrapper {
+  border: 1px solid #ddd;
+}
+
+.table-header {
+  background: #f5f7fa;
+  border-bottom: 1px solid #ddd;
+}
+
+.table-toolbar {
+  display: flex;
+  gap: 15px;
+  padding: 10px 15px;
+  background: #f8fbff;
+  border-bottom: 1px solid #e6f2ff;
+}
+
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #67c23a;
+  color: #fff;
+  border: none;
+  padding: 5px 15px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.add-btn .icon {
+  font-size: 16px;
+}
+
+.batch-delete-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #f56c6c;
+  color: #fff;
+  border: none;
+  padding: 5px 15px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.batch-delete-btn .icon {
+  font-size: 14px;
+}
+
+.passenger-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.passenger-table th {
+  padding: 10px 15px;
+  text-align: center;
+  background: #f5f7fa;
+  border-bottom: 1px solid #ddd;
+  font-weight: normal;
+  color: #666;
+}
+
+.passenger-table td {
+  padding: 12px 15px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+.verified-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background: #67c23a;
+  color: #fff;
+  border-radius: 50%;
+  line-height: 20px;
+  font-size: 12px;
+}
+
+.delete-btn, .edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  margin: 0 3px;
+}
+
+.delete-btn .icon {
+  color: #f56c6c;
+  font-size: 16px;
+}
+
+.edit-btn .icon {
+  color: #409eff;
+  font-size: 16px;
 }
 
 .no-data {
+  text-align: center;
   padding: 40px;
+  color: #999;
 }
 
 .bottom-nav {

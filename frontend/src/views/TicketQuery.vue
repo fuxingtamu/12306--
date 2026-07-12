@@ -4,27 +4,52 @@
     <div class="top-query-bar">
       <div class="query-left">
         <label class="radio-label">
-          <input type="radio" name="tripType" value="single" checked />
+          <input type="radio" name="tripType" value="single" v-model="tripType" />
           <span>单程</span>
         </label>
         <label class="radio-label">
-          <input type="radio" name="tripType" value="round" />
+          <input type="radio" name="tripType" value="round" v-model="tripType" />
           <span>往返</span>
         </label>
       </div>
       <div class="query-center">
         <div class="input-group">
           <span class="input-label">出发地</span>
-          <input type="text" v-model="queryForm.startStationName" placeholder="请输入出发站" />
+          <StationSelector
+            :selected-id="startStationId"
+            @change="handleStartStationChange"
+            placeholder="请输入出发站"
+          />
         </div>
         <button class="swap-btn" @click="handleSwap">↔</button>
         <div class="input-group">
           <span class="input-label">目的地</span>
-          <input type="text" v-model="queryForm.endStationName" placeholder="请输入到达站" />
+          <StationSelector
+            :selected-id="endStationId"
+            @change="handleEndStationChange"
+            placeholder="请输入到达站"
+          />
         </div>
-        <div class="input-group">
+        <div class="input-group date-group">
           <span class="input-label">出发日</span>
-          <input type="text" v-model="selectedDate" readonly />
+          <el-date-picker
+            v-model="selectedDate"
+            type="date"
+            placeholder="选择日期"
+            :disabled-date="disabledDate"
+            value-format="YYYY-MM-DD"
+            @change="handleQuery"
+          />
+        </div>
+        <div class="input-group date-group" v-if="tripType === 'round'">
+          <span class="input-label">返程日</span>
+          <el-date-picker
+            v-model="returnDate"
+            type="date"
+            placeholder="选择日期"
+            :disabled-date="disabledDate"
+            value-format="YYYY-MM-DD"
+          />
         </div>
       </div>
       <div class="query-right">
@@ -188,7 +213,7 @@
     <!-- 结果区域 -->
     <div class="result-panel">
       <div class="result-header">
-        <span class="route-info">{{ queryForm.startStationName }} --&gt; {{ queryForm.endStationName }}</span>
+        <span class="route-info">{{ startStationName }} --&gt; {{ endStationName }}</span>
         <span class="date-info">（{{ formatChineseDate(selectedDate) }} {{ getWeekDay(selectedDate) }}）</span>
         <span class="count-info">共计 {{ trains.length }} 个车次</span>
         <span class="tip">您可使用<span class="link">中转换乘</span>功能，查询途中换乘一次的部分列车余票情况。</span>
@@ -297,6 +322,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { trainApi } from '@/api'
+import StationSelector from '@/components/StationSelector.vue'
 
 interface TrainVO {
   trainId: number
@@ -326,7 +352,18 @@ const loading = ref(false)
 const trains = ref<TrainVO[]>([])
 
 const selectedDate = ref('')
+const returnDate = ref('')
+const tripType = ref('single')
 const todayStr = new Date().toISOString().split('T')[0]
+
+const startStationId = ref('')
+const endStationId = ref('')
+const startStationName = ref('')
+const endStationName = ref('')
+
+const disabledDate = (date: Date) => {
+  return date < new Date(new Date().toDateString())
+}
 
 const dateList = computed(() => {
   const dates = []
@@ -337,11 +374,6 @@ const dateList = computed(() => {
     dates.push(date.toISOString().split('T')[0])
   }
   return dates
-})
-
-const queryForm = ref({
-  startStationName: '',
-  endStationName: ''
 })
 
 const formatDateNum = (date: string) => {
@@ -384,30 +416,62 @@ const hasAvailableSeat = (train: TrainVO) => {
   return train.seats.some(s => s.hasTicket)
 }
 
+const handleStartStationChange = (station: any) => {
+  if (station) {
+    startStationId.value = station.id
+    startStationName.value = station.stationName
+  } else {
+    startStationId.value = ''
+    startStationName.value = ''
+  }
+}
+
+const handleEndStationChange = (station: any) => {
+  if (station) {
+    endStationId.value = station.id
+    endStationName.value = station.stationName
+  } else {
+    endStationId.value = ''
+    endStationName.value = ''
+  }
+}
+
+const handleSwap = () => {
+  const tempId = startStationId.value
+  startStationId.value = endStationId.value
+  endStationId.value = tempId
+  
+  const tempName = startStationName.value
+  startStationName.value = endStationName.value
+  endStationName.value = tempName
+}
+
 onMounted(() => {
-  if (route.query.startStation) queryForm.value.startStation = route.query.startStation as string
-  if (route.query.endStation) queryForm.value.endStation = route.query.endStation as string
-  if (route.query.startStationName) queryForm.value.startStationName = route.query.startStationName as string
-  if (route.query.endStationName) queryForm.value.endStationName = route.query.endStationName as string
+  if (route.query.startStation) startStationId.value = route.query.startStation as string
+  if (route.query.endStation) endStationId.value = route.query.endStation as string
+  if (route.query.startStationName) startStationName.value = route.query.startStationName as string
+  if (route.query.endStationName) endStationName.value = route.query.endStationName as string
   if (route.query.travelDate) selectedDate.value = route.query.travelDate as string
 
   if (!selectedDate.value) {
     selectedDate.value = todayStr
   }
 
-  handleQuery()
+  if (startStationId.value && endStationId.value) {
+    handleQuery()
+  }
 })
 
 const handleQuery = async () => {
-  if (!queryForm.value.startStation || !queryForm.value.endStation || !selectedDate.value) {
-    console.warn('查询条件不完整:', queryForm.value, selectedDate.value)
+  if (!startStationId.value || !endStationId.value || !selectedDate.value) {
+    console.warn('查询条件不完整:', startStationId.value, endStationId.value, selectedDate.value)
     return
   }
   loading.value = true
   try {
     const res = await trainApi.query({
-      startStation: queryForm.value.startStation,
-      endStation: queryForm.value.endStation,
+      startStation: startStationId.value,
+      endStation: endStationId.value,
       travelDate: selectedDate.value
     })
     trains.value = res.data
@@ -416,12 +480,6 @@ const handleQuery = async () => {
   } finally {
     loading.value = false
   }
-}
-
-const handleSwap = () => {
-  const temp = queryForm.value.startStationName
-  queryForm.value.startStationName = queryForm.value.endStationName
-  queryForm.value.endStationName = temp
 }
 </script>
 
@@ -482,12 +540,20 @@ const handleSwap = () => {
   color: #666;
 }
 
-.input-group input {
-  padding: 5px 8px;
-  border: 1px solid #ccc;
+.input-group :deep(.el-input__wrapper) {
+  padding: 4px 8px;
+  box-shadow: 0 0 0 1px #ccc inset;
   border-radius: 3px;
+}
+
+.input-group :deep(.el-input__inner) {
   font-size: 13px;
-  width: 120px;
+  height: 24px;
+  line-height: 24px;
+}
+
+.date-group :deep(.el-date-editor) {
+  width: 140px;
 }
 
 .swap-btn {

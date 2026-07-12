@@ -81,6 +81,8 @@ const router = useRouter()
 
 const startStationId = ref('')
 const endStationId = ref('')
+const startStationName = ref('')
+const endStationName = ref('')
 const travelDate = ref('')
 
 const disabledDate = (date: Date) => {
@@ -90,19 +92,25 @@ const disabledDate = (date: Date) => {
 const handleStartStationChange = (station: any) => {
   if (station) {
     startStationId.value = station.id
+    startStationName.value = station.name
   }
 }
 
 const handleEndStationChange = (station: any) => {
   if (station) {
     endStationId.value = station.id
+    endStationName.value = station.name
   }
 }
 
 const swapStations = () => {
-  const temp = startStationId.value
+  const tempId = startStationId.value
   startStationId.value = endStationId.value
-  endStationId.value = temp
+  endStationId.value = tempId
+  
+  const tempName = startStationName.value
+  startStationName.value = endStationName.value
+  endStationName.value = tempName
 }
 
 const handleSearch = () => {
@@ -115,6 +123,8 @@ const handleSearch = () => {
     query: {
       startStation: startStationId.value,
       endStation: endStationId.value,
+      startStationName: startStationName.value,
+      endStationName: endStationName.value,
       travelDate: travelDate.value
     }
   })
