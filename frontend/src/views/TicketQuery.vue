@@ -237,8 +237,28 @@
             <tr>
               <th class="col-train">车次</th>
               <th class="col-station">出发站<br/>到达站</th>
-              <th class="col-time">出发时间<br/>到达时间</th>
-              <th class="col-duration">历时</th>
+              <th class="col-time">
+                <div class="sort-header" @click="handleSort('startTime')">
+                  <span>出发时间</span>
+                  <span class="sort-arrow" :class="{ active: sortField === 'startTime' }">
+                    {{ sortField === 'startTime' && sortOrder === 'desc' ? '▼' : '▲' }}
+                  </span>
+                </div>
+                <div class="sort-header" @click="handleSort('endTime')">
+                  <span>到达时间</span>
+                  <span class="sort-arrow" :class="{ active: sortField === 'endTime' }">
+                    {{ sortField === 'endTime' && sortOrder === 'desc' ? '▼' : '▲' }}
+                  </span>
+                </div>
+              </th>
+              <th class="col-duration">
+                <div class="sort-header" @click="handleSort('duration')">
+                  <span>历时</span>
+                  <span class="sort-arrow" :class="{ active: sortField === 'duration' }">
+                    {{ sortField === 'duration' && sortOrder === 'desc' ? '▼' : '▲' }}
+                  </span>
+                </div>
+              </th>
               <th class="col-business">商务座<br/>特等座</th>
               <th class="col-preferred">优选<br/>一等座</th>
               <th class="col-first">一等座</th>
@@ -254,7 +274,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="train in trains" :key="train.trainId" class="train-row">
+            <tr v-for="train in sortedTrains" :key="train.trainId" class="train-row">
               <td class="train-col">
                 <div class="train-header">
                   <span class="train-code">{{ train.trainCode }}</span>
@@ -331,12 +351,16 @@ interface TrainVO {
   endStationName: string
   startTime: string
   endTime: string
+  totalTime: number       // 总耗时(分钟), 用于排序
   totalTimeText: string
   isFuxing?: boolean
   isJing?: boolean
   isZhi?: boolean
   seats: SeatVO[]
 }
+
+type SortField = 'startTime' | 'endTime' | 'duration'
+type SortOrder = 'asc' | 'desc'
 
 interface SeatVO {
   seatTypeName: string
@@ -350,6 +374,41 @@ const route = useRoute()
 
 const loading = ref(false)
 const trains = ref<TrainVO[]>([])
+const sortField = ref<SortField | null>(null)
+const sortOrder = ref<SortOrder>('asc')
+
+const parseTimeToMinutes = (time: string): number => {
+  if (!time) return 0
+  const parts = time.split(':')
+  return parseInt(parts[0]) * 60 + parseInt(parts[1])
+}
+
+const sortedTrains = computed(() => {
+  if (!sortField.value) return trains.value
+  const list = [...trains.value]
+  const order = sortOrder.value === 'asc' ? 1 : -1
+  list.sort((a, b) => {
+    let cmp = 0
+    if (sortField.value === 'startTime') {
+      cmp = parseTimeToMinutes(a.startTime) - parseTimeToMinutes(b.startTime)
+    } else if (sortField.value === 'endTime') {
+      cmp = parseTimeToMinutes(a.endTime) - parseTimeToMinutes(b.endTime)
+    } else if (sortField.value === 'duration') {
+      cmp = (a.totalTime || 0) - (b.totalTime || 0)
+    }
+    return cmp * order
+  })
+  return list
+})
+
+const handleSort = (field: SortField) => {
+  if (sortField.value === field) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortField.value = field
+    sortOrder.value = 'asc'
+  }
+}
 
 const selectedDate = ref('')
 const returnDate = ref('')
@@ -906,6 +965,32 @@ const handleQuery = async () => {
 .book-btn:disabled {
   background: #ccc;
   cursor: not-allowed;
+}
+
+/* 排序表头样式 */
+.sort-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  user-select: none;
+  padding: 3px 0;
+}
+
+.sort-header:hover {
+  opacity: 0.85;
+}
+
+.sort-arrow {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+  transition: color 0.15s;
+  line-height: 1;
+}
+
+.sort-arrow.active {
+  color: #ffa726;
 }
 
 .bottom-nav {
