@@ -110,9 +110,11 @@ public class TrainServiceImpl extends ServiceImpl<TrainMapper, Train> implements
                     .collect(Collectors.toList());
         }
 
-        // 转换为VO并生成余票信息
+        // 转换为VO并生成余票信息（使用查询的乘车站点，而非列车全程始发/终点站）
+        final String boardingStation = startStation.getStationName();
+        final String alightingStation = endStation.getStationName();
         List<TrainVO> trainVOs = trains.stream()
-                .map(train -> convertToVO(train, queryDTO.getTravelDate()))
+                .map(train -> convertToVO(train, queryDTO.getTravelDate(), boardingStation, alightingStation))
                 .collect(Collectors.toList());
 
         // 排序
@@ -142,7 +144,7 @@ public class TrainServiceImpl extends ServiceImpl<TrainMapper, Train> implements
             throw new RuntimeException("车次不存在");
         }
 
-        TrainVO trainVO = convertToVO(train, LocalDate.parse(travelDate));
+        TrainVO trainVO = convertToVO(train, LocalDate.parse(travelDate), null, null);
 
         // 获取经停站信息
         List<TrainStop> stops = trainStopMapper.selectList(
@@ -180,20 +182,21 @@ public class TrainServiceImpl extends ServiceImpl<TrainMapper, Train> implements
             throw new RuntimeException("车次不存在");
         }
 
-        return convertToVO(train, LocalDate.now());
+        return convertToVO(train, LocalDate.now(), null, null);
     }
 
     /**
      * 转换为VO
      */
-    private TrainVO convertToVO(Train train, LocalDate travelDate) {
+    private TrainVO convertToVO(Train train, LocalDate travelDate, String boardingStation, String alightingStation) {
         TrainVO vo = new TrainVO();
         vo.setTrainId(train.getId());
         vo.setTrainCode(train.getTrainCode());
         vo.setTrainType(train.getTrainType());
         vo.setTrainTypeName(getTrainTypeName(train.getTrainType()));
-        vo.setStartStationName(train.getStartStationName());
-        vo.setEndStationName(train.getEndStationName());
+        // 使用用户实际乘车站点（如有），否则回退到列车全程始发/终点站
+        vo.setStartStationName(boardingStation != null ? boardingStation : train.getStartStationName());
+        vo.setEndStationName(alightingStation != null ? alightingStation : train.getEndStationName());
         vo.setStartTime(train.getStartTime());
         vo.setEndTime(train.getEndTime());
         vo.setTotalTime(train.getTotalTime());

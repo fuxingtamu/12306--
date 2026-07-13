@@ -79,134 +79,70 @@
 
     <!-- 筛选区域 -->
     <div class="filter-panel">
-      <div class="filter-row">
-        <div class="filter-group">
-          <span class="filter-title">车次类型：</span>
-          <label class="filter-checkbox">
-            <input type="checkbox" checked />
-            <span>全部</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>GC-高铁/城际</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>D-动车</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>Z-直达</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>T-特快</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>K-快速</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>其他</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>复兴号</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>智能动车组</span>
-          </label>
-        </div>
-        <div class="time-filter">
-          <span>发车时间：</span>
-          <select>
-            <option>00:00-24:00</option>
-            <option>06:00-12:00</option>
-            <option>12:00-18:00</option>
-            <option>18:00-24:00</option>
-          </select>
-        </div>
+      <div class="filter-toggle-bar">
+        <span class="filter-toggle-hint">车次筛选</span>
+        <button class="filter-btn" @click="filterExpanded = !filterExpanded">
+          {{ filterExpanded ? '收起筛选 ▲' : '展开筛选 ▼' }}
+        </button>
       </div>
-
-      <div class="filter-row">
-        <div class="filter-group">
-          <span class="filter-title">出发车站：</span>
-          <label class="filter-checkbox">
-            <input type="checkbox" checked />
-            <span>全部</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>长沙</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>长沙南</span>
-          </label>
+      <div class="filter-body" v-show="filterExpanded">
+        <div class="filter-row">
+          <div class="filter-group">
+            <span class="filter-title">车次类型：</span>
+            <span class="filter-all" :class="{ active: filterTrainTypes.length === 0 }" @click="filterTrainTypes = []">全部</span>
+            <span class="filter-checkbox" v-for="opt in trainTypeOptions" :key="opt.value"
+                  :class="{ checked: filterTrainTypes.length === 0 || filterTrainTypes.includes(opt.value) }"
+                  @click="toggleTrainType(opt.value)">
+              <span class="check-mark">{{ filterTrainTypes.length === 0 || filterTrainTypes.includes(opt.value) ? '✓' : '' }}</span>
+              <span>{{ opt.label }}</span>
+            </span>
+          </div>
+          <div class="time-filter">
+            <span>发车时间：</span>
+            <select v-model="filterTimeRange">
+              <option v-for="opt in timeRangeOptions" :key="opt" :value="opt">{{ opt }}</option>
+            </select>
+          </div>
         </div>
-      </div>
 
-      <div class="filter-row">
-        <div class="filter-group">
-          <span class="filter-title">到达车站：</span>
-          <label class="filter-checkbox">
-            <input type="checkbox" checked />
-            <span>全部</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>徐州</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>徐州东</span>
-          </label>
+        <div class="filter-row">
+          <div class="filter-group">
+            <span class="filter-title">出发车站：</span>
+            <span class="filter-all" :class="{ active: filterStartStations.length === 0 }" @click="filterStartStations = []">全部</span>
+            <span class="filter-checkbox" v-for="station in startStationOptions" :key="station"
+                  :class="{ checked: filterStartStations.length === 0 || filterStartStations.includes(station) }"
+                  @click="toggleStartStation(station)">
+              <span class="check-mark">{{ filterStartStations.length === 0 || filterStartStations.includes(station) ? '✓' : '' }}</span>
+              <span>{{ station }}</span>
+            </span>
+          </div>
         </div>
-      </div>
 
-      <div class="filter-row">
-        <div class="filter-group">
-          <span class="filter-title">车次席别：</span>
-          <label class="filter-checkbox">
-            <input type="checkbox" checked />
-            <span>全部</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>商务座</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>一等座</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>二等座</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>一等卧</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>二等卧</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>软卧</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>硬卧</span>
-          </label>
-          <label class="filter-checkbox">
-            <input type="checkbox" />
-            <span>硬座</span>
-          </label>
+        <div class="filter-row">
+          <div class="filter-group">
+            <span class="filter-title">到达车站：</span>
+            <span class="filter-all" :class="{ active: filterEndStations.length === 0 }" @click="filterEndStations = []">全部</span>
+            <span class="filter-checkbox" v-for="station in endStationOptions" :key="station"
+                  :class="{ checked: filterEndStations.length === 0 || filterEndStations.includes(station) }"
+                  @click="toggleEndStation(station)">
+              <span class="check-mark">{{ filterEndStations.length === 0 || filterEndStations.includes(station) ? '✓' : '' }}</span>
+              <span>{{ station }}</span>
+            </span>
+          </div>
         </div>
-        <button class="filter-btn">筛选</button>
+
+        <div class="filter-row">
+          <div class="filter-group">
+            <span class="filter-title">车次席别：</span>
+            <span class="filter-all" :class="{ active: filterSeatTypes.length === 0 }" @click="filterSeatTypes = []">全部</span>
+            <span class="filter-checkbox" v-for="opt in seatTypeOptions" :key="opt"
+                  :class="{ checked: filterSeatTypes.length === 0 || filterSeatTypes.includes(opt) }"
+                  @click="toggleSeatType(opt)">
+              <span class="check-mark">{{ filterSeatTypes.length === 0 || filterSeatTypes.includes(opt) ? '✓' : '' }}</span>
+              <span>{{ opt }}</span>
+            </span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -215,7 +151,7 @@
       <div class="result-header">
         <span class="route-info">{{ startStationName }} --&gt; {{ endStationName }}</span>
         <span class="date-info">（{{ formatChineseDate(selectedDate) }} {{ getWeekDay(selectedDate) }}）</span>
-        <span class="count-info">共计 {{ trains.length }} 个车次</span>
+        <span class="count-info">共计 {{ displayTrains.length }} 个车次</span>
         <span class="tip">您可使用<span class="link">中转换乘</span>功能，查询途中换乘一次的部分列车余票情况。</span>
         <label class="filter-checkbox">
           <input type="checkbox" />
@@ -274,7 +210,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="train in sortedTrains" :key="train.trainId" class="train-row">
+            <tr v-for="train in displayTrains" :key="train.trainId" class="train-row">
               <td class="train-col">
                 <div class="train-header">
                   <span class="train-code">{{ train.trainCode }}</span>
@@ -341,7 +277,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { trainApi } from '@/api'
+import { trainApi, stationApi } from '@/api'
 import StationSelector from '@/components/StationSelector.vue'
 
 interface TrainVO {
@@ -376,16 +312,113 @@ const loading = ref(false)
 const trains = ref<TrainVO[]>([])
 const sortField = ref<SortField | null>(null)
 const sortOrder = ref<SortOrder>('asc')
+const filterExpanded = ref(false)
 
+// ========== 筛选选项定义 ==========
+const trainTypeOptions = [
+  { label: 'GC-高铁/城际', value: 'GC' },
+  { label: 'D-动车', value: 'D' },
+  { label: 'Z-直达', value: 'Z' },
+  { label: 'T-特快', value: 'T' },
+  { label: 'K-快速', value: 'K' },
+  { label: '其他', value: 'OTHER' },
+  { label: '复兴号', value: 'FUXING' },
+  { label: '智能动车组', value: 'ZHI' },
+]
+const seatTypeOptions = ['商务座', '一等座', '二等座', '一等卧', '二等卧', '软卧', '硬卧', '硬座']
+const timeRangeOptions = ['00:00-24:00', '06:00-12:00', '12:00-18:00', '18:00-24:00']
+
+// ========== 筛选状态 ==========
+const filterTrainTypes = ref<string[]>([])
+const filterTimeRange = ref('00:00-24:00')
+const filterStartStations = ref<string[]>([])
+const filterEndStations = ref<string[]>([])
+const filterSeatTypes = ref<string[]>([])
+
+// 动态选项: 通过车站API按城市名搜索同城车站
+const startStationOptions = ref<string[]>([])
+const endStationOptions = ref<string[]>([])
+
+const toggleTrainType = (value: string) => {
+  const arr = filterTrainTypes.value
+  filterTrainTypes.value = arr.includes(value) ? arr.filter(v => v !== value) : [...arr, value]
+}
+const toggleStartStation = (value: string) => {
+  const arr = filterStartStations.value
+  filterStartStations.value = arr.includes(value) ? arr.filter(v => v !== value) : [...arr, value]
+}
+const toggleEndStation = (value: string) => {
+  const arr = filterEndStations.value
+  filterEndStations.value = arr.includes(value) ? arr.filter(v => v !== value) : [...arr, value]
+}
+const toggleSeatType = (value: string) => {
+  const arr = filterSeatTypes.value
+  filterSeatTypes.value = arr.includes(value) ? arr.filter(v => v !== value) : [...arr, value]
+}
+
+// ========== 解析工具 ==========
 const parseTimeToMinutes = (time: string): number => {
   if (!time) return 0
   const parts = time.split(':')
   return parseInt(parts[0]) * 60 + parseInt(parts[1])
 }
 
-const sortedTrains = computed(() => {
-  if (!sortField.value) return trains.value
-  const list = [...trains.value]
+const getTrainCodeType = (code: string): string => {
+  const prefix = code.charAt(0).toUpperCase()
+  if (['G', 'C', 'D', 'Z', 'T', 'K'].includes(prefix)) return prefix
+  return 'OTHER'
+}
+
+// ========== 筛选 + 排序 ==========
+const filteredTrains = computed(() => {
+  let list = trains.value
+
+  // 车次类型筛选
+  if (filterTrainTypes.value.length > 0) {
+    list = list.filter(train => {
+      return filterTrainTypes.value.some(type => {
+        if (type === 'FUXING') return train.isFuxing
+        if (type === 'ZHI') return train.isZhi
+        if (type === 'OTHER') return !['G', 'C', 'D', 'Z', 'T', 'K'].includes(getTrainCodeType(train.trainCode))
+        // GC → G or C
+        if (type === 'GC') return train.trainCode.startsWith('G') || train.trainCode.startsWith('C')
+        return train.trainCode.startsWith(type)
+      })
+    })
+  }
+
+  // 发车时间筛选
+  if (filterTimeRange.value !== '00:00-24:00') {
+    const [rStart, rEnd] = filterTimeRange.value.split('-')
+    list = list.filter(train => {
+      const mins = parseTimeToMinutes(train.startTime)
+      return mins >= parseTimeToMinutes(rStart) && mins < parseTimeToMinutes(rEnd)
+    })
+  }
+
+  // 出发车站筛选
+  if (filterStartStations.value.length > 0) {
+    list = list.filter(train => filterStartStations.value.includes(train.startStationName))
+  }
+
+  // 到达车站筛选
+  if (filterEndStations.value.length > 0) {
+    list = list.filter(train => filterEndStations.value.includes(train.endStationName))
+  }
+
+  // 车次席别筛选
+  if (filterSeatTypes.value.length > 0) {
+    list = list.filter(train =>
+      train.seats.some(s => filterSeatTypes.value.some(st => s.seatTypeName.includes(st) || st.includes(s.seatTypeName)) && s.hasTicket)
+    )
+  }
+
+  return list
+})
+
+const displayTrains = computed(() => {
+  if (!sortField.value) return filteredTrains.value
+  const list = [...filteredTrains.value]
   const order = sortOrder.value === 'asc' ? 1 : -1
   list.sort((a, b) => {
     let cmp = 0
@@ -419,6 +452,33 @@ const startStationId = ref('')
 const endStationId = ref('')
 const startStationName = ref('')
 const endStationName = ref('')
+
+// 提取城市名(去掉常见方向后缀)
+const getCityName = (stationName: string): string => {
+  return stationName.replace(/[东南西北]$/, '').replace(/站$/, '')
+}
+
+// 查询同城车站列表（与查询同步触发）
+const fetchStationOptions = async () => {
+  const start = startStationName.value
+  const end = endStationName.value
+  if (start) {
+    try {
+      const city = getCityName(start)
+      const res: any = await stationApi.search(city)
+      const allStations: string[] = (res.data || []).map((s: any) => s.stationName)
+      startStationOptions.value = allStations.filter(name => getCityName(name) === city)
+    } catch { startStationOptions.value = [start] }
+  }
+  if (end) {
+    try {
+      const city = getCityName(end)
+      const res: any = await stationApi.search(city)
+      const allStations: string[] = (res.data || []).map((s: any) => s.stationName)
+      endStationOptions.value = allStations.filter(name => getCityName(name) === city)
+    } catch { endStationOptions.value = [end] }
+  }
+}
 
 const disabledDate = (date: Date) => {
   return date < new Date(new Date().toDateString())
@@ -518,6 +578,7 @@ onMounted(() => {
 
   if (startStationId.value && endStationId.value) {
     handleQuery()
+    fetchStationOptions()
   }
 })
 
@@ -534,6 +595,7 @@ const handleQuery = async () => {
       travelDate: selectedDate.value
     })
     trains.value = res.data
+    fetchStationOptions()
   } catch (error) {
     console.error('查询车次失败:', error)
   } finally {
@@ -680,9 +742,25 @@ const handleQuery = async () => {
 }
 
 .filter-panel {
-  padding: 8px 12px;
   background: #fff;
   border-bottom: 1px solid #d0d7de;
+}
+
+.filter-toggle-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+}
+
+.filter-toggle-hint {
+  font-size: 13px;
+  color: #333;
+  font-weight: bold;
+}
+
+.filter-body {
+  padding: 0 12px 8px 12px;
 }
 
 .filter-row {
@@ -709,18 +787,59 @@ const handleQuery = async () => {
   white-space: nowrap;
 }
 
+.filter-all {
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+  border-radius: 3px;
+  background: #f0f0f0;
+  border: 1px solid #d0d0d0;
+  user-select: none;
+  transition: all 0.15s;
+}
+
+.filter-all:hover {
+  background: #e0e0e0;
+}
+
+.filter-all.active {
+  background: #1a365d;
+  color: #fff;
+  border-color: #1a365d;
+}
+
 .filter-checkbox {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   font-size: 12px;
   color: #333;
   cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
 }
 
-.filter-checkbox input {
-  width: 13px;
-  height: 13px;
+.filter-checkbox .check-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #c0c0c0;
+  border-radius: 2px;
+  background: #fff;
+  font-size: 11px;
+  line-height: 1;
+  color: #fff;
+  transition: all 0.15s;
+}
+
+.filter-checkbox.checked .check-mark {
+  background: #1a365d;
+  border-color: #1a365d;
+  color: #fff;
 }
 
 .time-filter {

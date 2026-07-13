@@ -92,14 +92,14 @@ const disabledDate = (date: Date) => {
 const handleStartStationChange = (station: any) => {
   if (station) {
     startStationId.value = station.id
-    startStationName.value = station.name
+    startStationName.value = station.stationName
   }
 }
 
 const handleEndStationChange = (station: any) => {
   if (station) {
     endStationId.value = station.id
-    endStationName.value = station.name
+    endStationName.value = station.stationName
   }
 }
 
