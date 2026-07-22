@@ -1,0 +1,106 @@
+%% 组件图：系统组件关系
+graph TB
+
+    subgraph "前端组件 (Frontend)"
+        subgraph "页面组件"
+            HOME["HomeView\n首页"]
+            LOGIN["LoginView\n登录"]
+            TICKET["TicketQueryView\n车票查询"]
+            PASS["PassengersView\n旅客管理"]
+            ORDER["OrdersView\n订单列表"]
+        end
+
+        subgraph "公共组件"
+            HEADER["AppHeader\n头部"]
+            FOOTER["AppFooter\n底部"]
+            DIALOG["BaseDialog\n弹窗"]
+            TABLE["BaseTable\n表格"]
+            FORM["BaseForm\n表单"]
+        end
+
+        subgraph "状态管理"
+            USER_STORE["UserStore\n用户状态"]
+            PASS_STORE["PassengerStore\n旅客状态"]
+            ORDER_STORE["OrderStore\n订单状态"]
+        end
+
+        subgraph "网络层"
+            API_CLIENT["ApiClient\nHTTP客户端"]
+            AUTH_API["AuthAPI\n认证接口"]
+            PASS_API["PassengerAPI\n旅客接口"]
+            ORDER_API["OrderAPI\n订单接口"]
+        end
+    end
+
+    subgraph "后端组件 (Backend)"
+
+        subgraph "控制器层 (Controller)"
+            AUTH_CTRL["AuthController\n认证"]
+            USER_CTRL["UserController\n用户"]
+            PASS_CTRL["PassengerController\n旅客"]
+            TRAIN_CTRL["TrainController\n车次"]
+            ORDER_CTRL["OrderController\n订单"]
+        end
+
+        subgraph "服务层 (Service)"
+            AUTH_SVC["AuthService\n认证服务"]
+            USER_SVC["UserService\n用户服务"]
+            PASS_SVC["PassengerService\n旅客服务"]
+            TRAIN_SVC["TrainService\n车次服务"]
+            ORDER_SVC["OrderService\n订单服务"]
+            TICKET_SVC["TicketService\n票务服务"]
+            PAY_SVC["PaymentService\n支付服务"]
+        end
+
+        subgraph "数据访问层 (Mapper)"
+            USER_MAPPER["UserMapper"]
+            PASS_MAPPER["PassengerMapper"]
+            TRAIN_MAPPER["TrainMapper"]
+            ORDER_MAPPER["OrderMapper"]
+            TICKET_MAPPER["TicketInventoryMapper"]
+        end
+
+        subgraph "配置层 (Config)"
+            SECURITY["SecurityConfig\n安全配置"]
+            WEB_CONFIG["WebConfig\nWeb配置"]
+            REDIS_CONFIG["RedisConfig\n缓存配置"]
+        end
+    end
+
+    %% 前端内部关系
+    HOME --> HEADER
+    LOGIN --> AUTH_API
+    PASS --> PASS_API
+    ORDER --> ORDER_API
+    PASS --> PASS_STORE
+    ORDER --> ORDER_STORE
+    PASS_STORE --> API_CLIENT
+    PASS_API --> API_CLIENT
+
+    %% 前后端交互
+    AUTH_API --> AUTH_CTRL
+    PASS_API --> PASS_CTRL
+    ORDER_API --> ORDER_CTRL
+
+    %% 后端内部关系
+    AUTH_CTRL --> AUTH_SVC
+    PASS_CTRL --> PASS_SVC
+    ORDER_CTRL --> ORDER_SVC
+    TRAIN_CTRL --> TRAIN_SVC
+
+    AUTH_SVC --> USER_MAPPER
+    PASS_SVC --> PASS_MAPPER
+    TRAIN_SVC --> TRAIN_MAPPER
+    ORDER_SVC --> ORDER_MAPPER
+    ORDER_SVC --> TICKET_SVC
+    ORDER_SVC --> PAY_SVC
+
+    TICKET_SVC --> TICKET_MAPPER
+
+    %% 样式
+    style HOME,LOGIN,TICKET fill:#e3f2fd
+    style HEADER,FOOTER,DIALOG fill:#bbdefb
+    style USER_STORE,PASS_STORE,ORDER_STORE fill:#c8e6c9
+    style AUTH_CTRL,USER_CTRL,PASS_CTRL fill:#fff3e0
+    style AUTH_SVC,USER_SVC,PASS_SVC fill:#ffe0b2
+    style USER_MAPPER,PASS_MAPPER fill:#f3e5f5

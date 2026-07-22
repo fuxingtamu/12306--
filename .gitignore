@@ -1,0 +1,25 @@
+# Maven
+target/
+
+# Node
+node_modules/
+dist/
+
+# IDE
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Docker volumes
+mysql_data/
+redis_data/
+
+# Temp
+*.tmp
+*.temp

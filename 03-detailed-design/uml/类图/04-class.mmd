@@ -1,0 +1,125 @@
+%% 类图：核心业务类关系
+classDiagram
+    class User {
+        +Long id
+        +String phone
+        +String nickname
+        +String realName
+        +Boolean isVerified
+        +List~Passenger~ passengers
+        +List~Order~ orders
+        +login()
+        +logout()
+        +updateProfile()
+    }
+
+    class Passenger {
+        +Long id
+        +Long userId
+        +String name
+        +Gender gender
+        +Date birthDate
+        +IdType idType
+        +String idNumber
+        +String phone
+        +PassengerType passengerType
+        +Boolean isDefault
+        +CertificationStatus certificationStatus
+        +createPassenger()
+        +updatePassenger()
+        +deletePassenger()
+        +setDefault()
+    }
+
+    class Order {
+        +Long id
+        +String orderNo
+        +Long userId
+        +Train train
+        +Date travelDate
+        +OrderStatus status
+        +BigDecimal totalPrice
+        +List~OrderItem~ items
+        +createOrder()
+        +pay()
+        +cancel()
+        +refund()
+        +change()
+    }
+
+    class OrderItem {
+        +Long id
+        +Long orderId
+        +Passenger passenger
+        +SeatType seatType
+        +String seatNumber
+        +BigDecimal price
+        +TicketStatus status
+        +getTicket()
+        +refundTicket()
+    }
+
+    class Train {
+        +Long id
+        +String trainCode
+        +TrainType type
+        +Station startStation
+        +Station endStation
+        +Time startTime
+        +Time endTime
+        +Integer totalTime
+        +List~TrainStop~ stops
+        +queryByCode()
+        +queryByRoute()
+    }
+
+    class TicketInventory {
+        +Long id
+        +Long trainId
+        +Date travelDate
+        +SeatType seatType
+        +Integer totalSeats
+        +Integer availableSeats
+        +BigDecimal price
+        +lockSeat()
+        +confirmSeat()
+        +releaseSeat()
+    }
+
+    class "PassengerType" {
+        <<enumeration>>
+        ADULT
+        CHILD
+        STUDENT
+        DISABLED_SOLDIER
+    }
+
+    class "OrderStatus" {
+        <<enumeration>>
+        UNPAID
+        PAID
+        CANCELLED
+        COMPLETED
+        REFUNDED
+        CHANGED
+    }
+
+    class "CertificationStatus" {
+        <<enumeration>>
+        UNVERIFIED
+        VERIFIED
+        EXPIRED
+    }
+
+    %% 关系
+    User "1" *-- "0..8" Passenger : has
+    User "1" *-- "0..N" Order : places
+    Order "1" *-- "1..N" OrderItem : contains
+    Passenger "1" *-- "0..N" OrderItem : books
+    Train "1" *-- "0..N" TicketInventory : has
+    Order --> Train : references
+    OrderItem --> TicketInventory : reserves
+
+    Passenger --> PassengerType
+    Order --> OrderStatus
+    Passenger --> CertificationStatus

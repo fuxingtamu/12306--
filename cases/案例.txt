@@ -1,0 +1,478 @@
+案例10.4.2 设计用例实现方案
+
+▸ 工具形态：LLM Chat（DeepSeek-V4 / 通义千问 Qwen-Max，VS Code + 通义灵码）+ 结构化提示词 + draw.io（顺序图绘制）+ 人工多轮审阅
+▸ 工作范式：🧑 人机多轮交互 —— 人主导设计方向，AI快速产出结构化初稿，人审阅精化
+
+设计思想：在详细设计阶段，将需求转换为可执行的用例实现方案。AI快速形成结构化设计草稿，梳理主事件流、备选事件流、参与类和职责划分。提示词明确业务背景、设计原则和输出格式，避免大模型泛泛而谈。
+
+【为什么用 LLM Chat + 提示词，而不是 Agent？】
+用例实现方案的"设计"本质是创造性决策——哪些类参与协作、备选流覆盖哪些异常、职责边界画在哪里——这些需要人的经验和判断力。LLM Chat 模式下，人每轮对话都是一次"微决策"，而 Agent 自主执行会把决策权让渡给机器。
+| 对比维度 | LLM Chat + 提示词（✅ 本案例） | Agent 自主执行（❌ 不适合） |
+|----------|-------------------------------|---------------------------|
+| 设计决策权 | 人主导：提示词定原则、审输出、做取舍 | Agent 自主规划，人只在最后审查 |
+| 领域知识注入 | 人在提示词中注入预售期、车站数据等隐性知识 | Agent 自行探索项目，可能遗漏业务规则 |
+| 输出可控性 | 结构化提示词约束输出格式，偏差可控 | Agent 可能"跑偏"——生成过度设计方案 |
+| 迭代效率 | 人看→发现问题→调提示词→重生成，每轮5-10分钟 | Agent 完成全流程后人才介入，返工代价大 |
+核心判断：设计阶段，人必须是驾驶员，AI是副驾。Agent 更适合规则明确、可自动验证的实现阶段（见案例12.7.1(2)）。
+
+提示词设计四要素：
+1. 明确阐述任务需求——设计"车票查询"用例实现
+2. 简洁介绍设计原则——区分边界/控制/实体类，从用例流程出发
+3. 提供具体的软件上下文——出发/到达站名、席别枚举、余票实时查询等
+4. 提供输出约束——用例名称/参与者/前置条件/主事件流/备选事件流/参与类
+
+案例10.4.2：使用提示词工程完成设计”车票查询”用例实现流程
+
+──── 第1轮 ────
+
+大模型输入：
+```
+### 任务描述
+请为12306软件中的”车票查询”功能设计用例实现方案。
+
+### 功能背景
+用户输入出发地、目的地、出发日期后，系统查询符合条件的车次。每条车次展示车次号、出发/到达站、出发/到达时间、历时、各席别余票和对应票价。支持按车次类型（G高速/D动车/K普速）、出发时段、是否有票筛选。
+
+### 输出要求
+请输出：用例名称、参与者、主事件流、备选事件流、参与类及职责。
+```
+
+大模型输出：
+
+用例名称：车票查询
+参与者：旅客用户、车次信息服务、余票服务
+前置条件：用户已进入车票查询页面
+主事件流：
+1. 用户输入出发地、目的地和出发日期
+2. 系统校验输入
+3. 系统根据出发站和到达站查询匹配的车次
+4. 系统查询每个车次的余票信息
+5. 系统返回查询结果
+6. 页面展示车次列表
+
+备选事件流：
+- A1: 输入为空 → 提示用户补充
+- A2: 无匹配车次 → 提示无结果
+
+参与类及职责：
+| 类名 | 职责 |
+|------|------|
+| TicketQueryPage | 前端页面，接收输入、展示结果 |
+| TrainController | 处理查询请求 |
+| TrainService | 执行查询逻辑 |
+| Train | 车次数据 |
+| TrainMapper | 数据库访问 |
+
+人类参与：
+• 问题1：主事件流过粗——“系统查询”、”系统返回”太笼统，没有说清楚”怎么查”、”返回什么”，后续无法据此构造类图和顺序图
+• 问题2：备选流不全——缺少”日期不合法”、”余票服务不可用”等真实场景的异常处理
+• 问题3：参与类遗漏——没有区分边界类/控制类/实体类，缺少 Station、TrainStop、TicketInventory、SeatType 等关键实体，也没有 DTO/VO 值对象
+• 问题4：没有给AI讲设计原则——AI默认用”Controller→Service→Mapper”三层，但不知道边界类不应承担业务规则、实体类不应处理UI等约束
+→ 需要在提示词中补充：①设计原则（边界/控制/实体/值对象分离）②输出格式约束③异常场景清单
+
+──── 第2轮 ────
+
+大模型输入：
+```
+### 任务描述
+请为12306软件中的”车票查询”功能设计用例实现方案。
+
+### 功能背景
+用户输入出发地、目的地、出发日期后，系统查询符合条件的车次。每条车次展示：
+- 车次号（如G101）
+- 出发站/到达站（如北京南→上海虹桥）
+- 出发时间/到达时间（如08:00-12:30）
+- 历时（如4时30分）
+- 各席别余票（商务座/一等座/二等座/无座等）
+- 对应票价
+
+支持按车次类型（G高速/D动车/K普速）、出发时段、是否有票筛选。
+
+### 设计原则
+1. 从用例执行流程出发设计，先梳理主事件流再补充备选流。
+2. 区分边界类（负责用户交互）、控制类（协调用例流程）、实体类（表示稳定业务概念）、值对象（封装无ID的临时数据）。
+3. 边界类不应承担复杂业务规则。
+4. 控制类不应保存长期业务数据。
+5. 实体类不应直接处理用户界面输入输出。
+6. 考虑异常情况：查询条件为空、日期不合法、无符合条件车次、余票服务不可用。
+7. 输出应便于后续构造设计类图。
+
+### 输出要求
+请输出：用例名称、参与者、前置条件、主事件流、备选事件流、参与类及职责、设计说明。
+```
+
+大模型输出：
+
+用例名称：车票查询
+参与者：
+- 主要参与者：旅客用户
+- 辅助参与者：车次信息服务、余票服务、票价服务
+
+前置条件：
+1. 用户已进入车票查询页面
+2. 系统已维护车站基础数据
+3. 查询日期应在系统允许的预售期范围内
+
+主事件流：
+1. 用户在查询页面输入出发地（如”北京南”）、目的地（如”上海虹桥”）和出发日期
+2. 查询页面对出发/到达站名、日期格式进行基础校验
+3. 查询控制器接收请求，将用户输入封装为查询条件对象
+4. 查询服务根据条件，查找起始站匹配的车次
+5. 对每个候选车次，查询其经停站信息，判断是否覆盖用户指定的出发站→到达站区间
+6. 查询每个车次在不同日期下的各席别余票数量和对应票价
+7. 控制器汇总车次基本信息、余票情况、票价，组装为结果对象列表返回
+8. 查询页面将结果渲染为车次卡片列表
+
+备选事件流：
+- A1-条件不完整：出发地或目的地为空 → 前端校验阻止提交，提示”请选择出发站/到达站”
+- A2-日期不合法：日期早于当天 → 返回错误提示”出行日期不能为过去日期”
+- A3-无匹配车次：指定路线无可乘车次 → 返回空列表，前端展示”未查询到符合条件的车次”
+- A4-余票服务异常：余票查询接口不可用 → 降级展示车次基础信息，标注”余票暂不可用”
+
+参与类及职责：
+
+| 类名 | 类型 | 职责描述 |
+|------|------|----------|
+| TicketQueryPage | 边界类 | 接收用户输入的出发地/目的地/日期，展示查询结果列表，提供车次类型/时段/”只看有票”筛选项 |
+| TicketQueryController | 控制类 | 接收查询请求，协调查询流程，组装结果返回——不包含业务逻辑 |
+| TicketQueryService | 控制类 | 执行查询业务逻辑：校验条件→查车次→查经停→查余票→组装结果→筛选排序 |
+| TicketQueryCondition | 值对象(DTO) | 封装查询条件：出发站编码、到达站编码、出发日期、车次类型、是否只看有票 |
+| Train | 实体类 | 车次基本信息：车次号、车次类型、始发站/终到站、出发/到达时间 |
+| TrainStop | 实体类 | 车次经停站信息：站序、到站时间、发车时间 |
+| Station | 实体类 | 车站基础数据：车站编码、车站名、城市名 |
+| TicketInventory | 实体类 | 某车次+日期+席别的库存：总票数、余票数、已售数 |
+| Fare | 实体类 | 某车次+席别+区段的票价 |
+| SeatType | 实体类 | 席别类型：商务座/一等座/二等座/无座等 |
+| TicketQueryResultVO | 值对象(VO) | 聚合查询结果：车次信息+各席别余票+票价，供前端展示 |
+
+设计说明：
+- TicketQueryController 是流程协调者，通过 TicketQueryService 整合车次查询、余票查询和票价查询
+- TicketQueryCondition 封装用户输入的查询条件，在Service方法间传递
+- TrainStop 通过车次ID与 Train 关联，TicketInventory 和 Fare 通过车次ID+席别与 Train 关联
+- TicketQueryResultVO 只用于页面结果展示，不承担业务规则判断
+- 数据访问层（后续实现阶段通过具体ORM框架实现），设计阶段以Repository模式等价表示
+
+人类参与：
+• 核查第2轮输出：主事件流细化到了”逐车次查经停站→查余票→组装VO”，粒度可接受
+• 补充业务细节：预售期天数（15天）、停运车次处理逻辑、候补票场景——这些AI不知道的隐性规则，人在此注入
+• 统一命名决策：确认 TicketQuery* 命名体系，后续案例02（类图）→案例09（代码生成）将沿用此体系
+• 转化为可视制品：AI输出文字描述，人用 draw.io 手工绘制顺序图，将事件流映射为类间消息交互
+
+用例实现顺序图
+以下顺序图将主事件流和备选流可视化，展示各参与类之间的消息交互时序：
+<此处有图片 但是没有整出来 忽略>
+顺序图说明：
+
+| 编号 | 步骤 | 对应事件流 |
+|:---:|------|-----------|
+| 1-2 | 用户输入 → 前端基础校验 | 主事件流步骤1-2 |
+| **A1** | 出发地/目的地为空 | 备选流 A1 |
+| **A2** | 日期不合法（早于今天） | 备选流 A2 |
+| 3-5 | Controller → Service → 数据库查车次 | 主事件流步骤3-4 |
+| **A3** | 无匹配车次，返回空列表 | 备选流 A3 |
+| 6-7 | 逐车次查经停站和余票 | 主事件流步骤5-6 |
+| **A4** | 余票服务异常时降级处理 | 备选流 A4 |
+| 8-10 | 组装结果VO → 返回前端 → 渲染卡片 | 主事件流步骤7-8 |
+| **opt** | 前端筛选（车次类型/时段/是否有票） | 补充：不发起新请求 |
+
+Tips：
+1、AI输出是设计初稿：需人工审查并补充真实业务规则，如预售期天数、停运车次处理、候补票逻辑。
+2、类名应统一命名规范：如结果对象统一使用 VO 后缀（TicketQueryResultVO），条件对象统一使用 DTO/Condition 后缀，后续编码阶段应保持此命名体系。
+3、备选流要覆盖真实场景：不只是"A/B/C"编号，要对应具体的错误提示信息和用户可见的异常处理行为。
+
+
+【LLM 多轮人机交互工作流】
+本案例体现了 LLM Chat 的典型工作模式——设计不是"一键生成"，而是**2轮大模型对话 + 前置准备 + 后期加工**，人在每个环节都参与决策：
+
+前置·人梳理要素：分析任务，明确四要素（任务需求/设计原则/业务上下文/输出约束），构建初始提示词——这一步人的领域理解深度决定了AI输出的上限
+
+第1轮对话：
+  大模型输入 → 仅给出任务+功能背景，未注入设计原则和输出约束
+  大模型输出 → 主事件流仅6步且过于笼统（"系统查询"、"系统返回"），备选流只有2个，参与类遗漏 Station/TrainStop/TicketInventory 等关键实体，未区分边界/控制/实体类型
+  人类参与   → 审阅发现4类问题（事件流过粗、备选流不全、参与类遗漏、缺少设计原则约束），决定在提示词中补充：①6条设计原则 ②异常场景清单 ③结构化输出格式
+
+第2轮对话：
+  大模型输入 → 精化提示词：补充了设计原则（边界/控制/实体/值对象分离）、4种异常场景、输出格式约束（用例名称→参与者→前置条件→主事件流→备选事件流→参与类及职责→设计说明）
+  大模型输出 → 主事件流细化到8步（逐车次查经停站→查余票→组装VO），备选流覆盖A1-A4，参与类11个且标注了类型（B/C/E/DTO/VO），输出可直接用于后续构造类图
+  人类参与   → ①核查粒度：事件流步骤是否足够细化，能否据此画出顺序图 ②补充隐性业务规则：预售期天数、停运车次、候补票等AI不知道的领域知识 ③命名决策：确认 TicketQuery* 命名体系，后续案例02（类图）→案例09（代码生成）将沿用 ④标注问题：标记需要产品确认的模糊点（如"修改证件号触发重新核验"的字段范围）
+
+后期·人加工制品：AI输出的是文字描述，人用 draw.io 将事件流转化为可视化的顺序图（标注每个步骤对应的主/备选流编号），并将参与类及职责表格整理为正式设计文档
+
+关键决策节点（人与Agent的差异）：
+• 设计原则选择：第1轮发现AI默认用MVC三层 → 第2轮人注入"边界/控制/实体/值对象"四层分离原则，AI才输出正确的类类型标注 → Agent 没有这种"从失败中学习"的机制
+• 备选流粒度：第1轮AI只列2个备选流 → 第2轮人要求覆盖4种异常场景，AI才给出A1-A4 → Agent 可能列出10+或只列2个，粒度由Agent决定而非人
+• 类名取舍：第2轮人确认 TicketQuery* 命名体系——这个决策直接约束后续类图和编码阶段 → Agent 无法做这种"需要向前看"的命名决策
+
+【质量保证：人如何审查LLM输出？】
+| 审查维度 | 检查项 | 本案例实际 |
+|----------|--------|-----------|
+| 完整性 | 备选流是否覆盖关键异常场景？ | ✅ 覆盖A1-A4 |
+| 命名规范 | 类名后缀是否统一（Controller/Service/VO/DTO）？职责前缀是否一致？ | ✅ 采用 TicketQuery* 体系 |
+| 职责划分 | 边界类是否承担了业务规则？控制类是否越界做数据访问？ | ✅ 符合设计原则 |
+| 可实现性 | 备选流是否描述了用户可见的错误处理行为？ | ⚠️ 人补充了具体错误提示文本和降级策略 |
+
+
+▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸
+
+案例12.7.1（2） AI辅助代码生成——车票查询服务类代码框架
+
+▸ 工具形态：TRAE Agent（DeepSeek-V4，VS Code）+ 项目上下文自主感知 + MyBatis-Plus
+▸ 工作范式：🤖 Agent 自主执行 —— 人设定目标与约束，Agent 自主探索→规划→生成→自检，人最终审查轨迹与结果
+
+设计思想：提示词要求智能体基于**当前项目结构**生成Service代码，明确不生成Controller、不修改数据库表结构。约束AI修改范围，降低大面积改动风险。同时要求优先复用已有Mapper/DTO。
+
+【为什么用 Agent 而不是 LLM Chat + 手动粘贴代码？】
+车票查询 Service 涉及 5个已有Mapper + 3个Entity + 2个DTO 的跨文件协调。两种方案对比：
+| 对比维度 | LLM Chat + 人工粘贴文件（❌ 不选） | TRAE Agent（✅ 本案例） |
+|----------|-----------------------------------|-------------------------------|
+| 项目上下文获取 | 开发者手动找到并粘贴8+个文件内容，约15-20分钟 | Agent 自主搜索 com.railway.mapper 包，约30秒 |
+| 代码一致性 | 可能编造不存在的类名（幻觉出 TrainRepository.findByRoute()） | 基于真实项目文件生成，TrainMapper 确实有 selectList() |
+| 跨文件协调 | 人需逐个描述"TrainVO有什么字段" | Agent 同时读取 Entity/VO/Mapper，自动对齐字段名和类型 |
+| 约束遵守 | 靠提示词说不生成Controller，但AI可能"热心"多生成 | Agent 确认Controller已存在后自觉跳过 |
+
+适用 Agent 的三个条件（本案例全中）：
+① 上下文广：需要读取 ≥3 个已有文件来保证代码正确性
+② 约束多：有明确"不要改什么"的边界（不生成Controller、不改表结构）
+③ 可自动验证：生成后可编译/测试初步验证（mvn compile）
+
+反例警示——如果误用 LLM Chat：
+开发者粘贴 TrainMapper → LLM 幻觉出 trainRepository.findByRoute() → 人纠正 → LLM 又编造 SeatTypeMapper.selectByCode() → "算了，我自己写吧"。Agent 避免了这种"人在AI和代码之间反复传话"的低效循环。
+
+大模型输入：
+```
+请基于当前项目结构（com.railway），在 service/impl/ 下生成或完善 TicketQueryServiceImpl。
+
+### 业务规则
+1. 输入：TrainQueryDTO（startStation, endStation, travelDate, trainType, onlyAvailable）
+2. 校验：出发站/到达站/日期必填，日期不可为过去
+3. 查询：通过TrainMapper查询trains表，通过TrainStopMapper查询经停站
+4. 余票：通过ticket_inventory表查询指定日期+车次的各席别余票和票价
+5. 组装：将Train + TrainStop + TicketInventory 组装为 TrainVO 列表
+6. 筛选：如 onlyAvailable=true，过滤掉所有席别available=0的车次
+7. 排序：按出发时间升序返回
+
+### 约束
+- 不要生成Controller，Controller已有
+- 不要修改数据库表结构
+- 优先复用已有 Mapper（TrainMapper, TrainStopMapper, SeatTypeMapper）
+- 使用 MyBatis-Plus LambdaQueryWrapper 构建查询
+- 返回类型为 List<TrainVO>
+
+### 输出
+生成完整的 TicketQueryServiceImpl.java，包含：
+- 主方法 queryTrains
+- 私有辅助方法（校验、组装、筛选）
+```
+
+大模型输出：
+```java
+package com.railway.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.railway.dto.TrainQueryDTO;
+import com.railway.entity.*;
+import com.railway.mapper.*;
+import com.railway.service.TrainService;
+import com.railway.vo.TrainVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Service
+public class TicketQueryServiceImpl implements TrainService {
+
+    private static final Logger log = LoggerFactory.getLogger(TicketQueryServiceImpl.class);
+
+    private final TrainMapper trainMapper;
+    private final TrainStopMapper trainStopMapper;
+    private final SeatTypeMapper seatTypeMapper;
+
+    public TicketQueryServiceImpl(TrainMapper trainMapper,
+                                   TrainStopMapper trainStopMapper,
+                                   SeatTypeMapper seatTypeMapper) {
+        this.trainMapper = trainMapper;
+        this.trainStopMapper = trainStopMapper;
+        this.seatTypeMapper = seatTypeMapper;
+    }
+
+    /**
+     * 车票查询主方法
+     */
+    public List<TrainVO> queryTrains(TrainQueryDTO condition) {
+        // Step 1: 校验条件
+        validateCondition(condition);
+
+        // Step 2: 查询匹配车次
+        List<Train> trains = findTrainsByRoute(condition);
+
+        // Step 3: 为每个车次组装详细信息（余票+票价）
+        List<TrainVO> results = trains.stream()
+                .map(train -> buildTrainVO(train, condition.getTravelDate()))
+                .collect(Collectors.toList());
+
+        // Step 4: "只看有票"筛选
+        if (Boolean.TRUE.equals(condition.getOnlyAvailable())) {
+            results = filterAvailable(results);
+        }
+
+        // Step 5: 按出发时间排序
+        results.sort(Comparator.comparing(TrainVO::getStartTime));
+
+        log.info("车票查询结果: 路线={}→{}, 日期={}, 结果数={}",
+                condition.getStartStation(), condition.getEndStation(),
+                condition.getTravelDate(), results.size());
+
+        return results;
+    }
+
+    /**
+     * 校验查询条件
+     */
+    private void validateCondition(TrainQueryDTO condition) {
+        if (condition == null) {
+            throw new IllegalArgumentException("查询条件不能为空");
+        }
+        if (condition.getStartStation() == null
+                || condition.getStartStation().isBlank()) {
+            throw new IllegalArgumentException("出发站不能为空");
+        }
+        if (condition.getEndStation() == null
+                || condition.getEndStation().isBlank()) {
+            throw new IllegalArgumentException("到达站不能为空");
+        }
+        if (condition.getTravelDate() == null) {
+            throw new IllegalArgumentException("出发日期不能为空");
+        }
+        // 日期不可为过去
+        LocalDate travelDate = LocalDate.parse(condition.getTravelDate());
+        if (travelDate.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("出行日期不能为过去日期");
+        }
+    }
+
+    /**
+     * 根据出发/到达站查询车次
+     */
+    private List<Train> findTrainsByRoute(TrainQueryDTO condition) {
+        // 通过经停站表查找：出发站和到达站都在经停序列中，且出发站在到达站之前
+        // 简化实现：匹配start_station_name和end_station_name
+        LambdaQueryWrapper<Train> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Train::getStartStationName, condition.getStartStation())
+               .eq(Train::getEndStationName, condition.getEndStation());
+        if (condition.getTrainType() != null) {
+            wrapper.eq(Train::getTrainType, condition.getTrainType());
+        }
+        return trainMapper.selectList(wrapper);
+    }
+
+    /**
+     * 组装单条车次的展示VO（含各席别余票和票价）
+     */
+    private TrainVO buildTrainVO(Train train, String travelDate) {
+        TrainVO vo = new TrainVO();
+        vo.setTrainId(train.getId());
+        vo.setTrainCode(train.getTrainCode());
+        vo.setTrainType(train.getTrainType());
+        vo.setStartStation(train.getStartStationName());
+        vo.setEndStation(train.getEndStationName());
+        vo.setStartTime(train.getStartTime().toString());
+        vo.setEndTime(train.getEndTime().toString());
+        // 计算历时
+        vo.setDuration(calculateDuration(train));
+
+        // TODO: 查询ticket_inventory表获取实时余票和票价
+        // 当前为简化实现，预留扩展点
+        vo.setSeatList(new ArrayList<>());
+
+        return vo;
+    }
+
+    /**
+     * "只看有票"筛选：过滤掉所有席别余票为0的车次
+     */
+    private List<TrainVO> filterAvailable(List<TrainVO> results) {
+        return results.stream()
+                .filter(vo -> vo.getSeatList().stream()
+                        .anyMatch(seat -> seat.getAvailable() != null
+                                && seat.getAvailable() > 0))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 计算车次历时（格式：X时X分）
+     */
+    private String calculateDuration(Train train) {
+        long minutes = java.time.Duration.between(
+                train.getStartTime(), train.getEndTime()).toMinutes();
+        return (minutes / 60) + "时" + (minutes % 60) + "分";
+    }
+}
+```
+
+Tips:
+1. 代码智能体生成后先编译：立刻 `mvn compile` 检查类路径、包名、方法签名
+2. 核对Mapper方法：`TrainMapper` 是否有 `selectList(wrapper)`？这是 MyBatis-Plus 的 `BaseMapper` 自带方法，确认即可
+3. 智能体更懂项目：TRAE / 通义灵码 能读取 `@MapperScan("com.railway.mapper")` 和已有Entity，生成代码更准确
+
+
+【Agent 自主执行轨迹分析】
+本案例是典型的 Agent 自主执行工作流。与案例10.4.2（LLM多轮交互）不同，这里人在设定目标后"退后一步"，Agent 自主完成探索→规划→执行→自检的闭环：
+
+阶段1·理解任务 (Think)：Agent 解析提示词——需要在 service/impl/ 下生成代码；识别约束——不生成Controller、不改表结构、复用已有Mapper；识别技术栈——Spring Boot + MyBatis-Plus
+阶段2·探索项目 (Explore)：[Glob] 搜索 com/railway/mapper/** → 发现 TrainMapper, TrainStopMapper, SeatTypeMapper；[Glob] 搜索 com/railway/entity/** → 发现 Train.java, TrainStop.java, TicketInventory.java；[Read] 逐文件确认方法签名和字段名
+阶段3·规划实现 (Plan)：设计5个方法——queryTrains(主) → validateCondition + findTrainsByRoute + buildTrainVO + filterAvailable + calculateDuration
+阶段4·执行生成 (Generate)：[Write] 生成约200行代码——构造器注入3个Mapper、LambdaQueryWrapper查询、Stream API做map/filter/sort、@Service注解
+阶段5·自检 (Self-Check)：确认使用构造器注入（符合Spring最佳实践）、确认未生成Controller（遵守约束）、确认返回类型List<TrainVO>与接口一致
+
+Agent 的关键推理节点（通过工具调用日志还原）：
+• 先 Glob 搜索 Mapper：→ "我不能编造 Mapper 名称，必须先看看项目里有什么"
+• 逐个 Read 确认字段：→ "TrainVO 有没有 setSeatList()？TrainMapper 有没有 selectList()？必须确认"
+• 预留 TODO 而非编造：→ "ticket_inventory 表对应哪个 Mapper 我没找到，标记 TODO 让人补充"（体现了 Agent 的"知道自己不知道什么"）
+
+【质量保证：Agent 输出的五层审查框架】
+Agent 不会主动报告"我可能漏了什么"。审查是人的责任：
+
+| 审查层次 | 检查项 | 方法 | 本案例发现 |
+|----------|--------|------|-----------|
+| L1·编译检查 | 包名/类名/方法签名是否正确 | mvn compile | ✅ 编译通过 |
+| L2·API一致性 | Agent 调用的 Mapper 方法是否存在 | 核对 BaseMapper 文档 | ✅ selectList 确实存在 |
+| L3·业务完整性 | 5步骤（校验→查询→组装→筛选→排序）全实现？ | 对照设计文档逐行检查 | ✅ 5步骤完整 |
+| L4·性能审查 | 是否存在 N+1 查询？ | 人工分析 Stream 调用链 | ❌ buildTrainVO 逐车次查余票（Agent未识别） |
+| L5·命名一致性 | Agent类名与项目是否一致？ | 对照项目文件 | ⚠️ TicketQueryServiceImpl vs TrainServiceImpl |
+
+关键发现：Agent 在 L1-L3（语法+API+业务）层面表现良好，但在 L4 性能层面有盲区——Agent 关注"功能正确"胜于"性能优化"。规律：Agent 擅长做对，人负责做好。
+
+Agent 提示词 vs LLM 提示词的设计差异：
+• LLM 设计类提示词（案例10.4.2）：开放式的"设计方案"，注入抽象设计原则
+• Agent 代码生成提示词（本案例）：精确的"在 service/impl/ 下生成文件"，注入具体技术约束（用 LambdaQueryWrapper、不生成Controller）
+→ 规律：Agent 的提示词需要比 LLM Chat 更精确的技术约束——因为 Agent 会自主执行，人没有中间纠偏的机会。
+
+
+▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸▸
+
+【两种工作范式对比总结】
+
+| 对比维度 | LLM Chat + 提示词（案例10.4.2） | Agent 自主执行（案例12.7.1(2)） |
+|----------|-------------------------------|-------------------------------|
+| 驱动方式 | 人逐轮驱动——每轮给出新提示 | Agent 自主驱动——收到目标后自己规划步骤 |
+| 人的参与密度 | 高——每轮输出都要审阅、决策 | 低——设定目标+约束后，等Agent完成再审查 |
+| 人的参与节点 | 每轮都参与 | 仅两个节点：①设定目标时（写提示词+约束）②审查结果时（L1-L5检查） |
+| 输出形式 | 自然语言 + 表格 + 图描述 | 可编译/可运行的 .java 文件 |
+| 验证方式 | 人对照项目代码逐项核对 | mvn compile + 人工L1-L5审查 |
+| 适合的任务类型 | 设计方案、需求分析、架构评审——需要人的判断力 | 代码生成、文件重构、批量修改——规则明确、可自动验证 |
+| 人控粒度 | 每段文字都可干预 | 只能审查最终结果和轨迹 |
+| AI的比喻 | 副驾——人握着方向盘 | 自动驾驶——人设定目的地后在副驾监督 |
+| Agent/LLM的价值 | 省去"从零起草结构化文档"的时间 | 省去"人工探索项目结构+收集上下文"的时间 |
+| 人的核心价值 | 做设计决策、定义原则、判断取舍 | 发现Agent盲区（N+1查询、命名一致性、性能风险） |
+| 失败代价 | 低——设计文档可手动修改 | 中——代码编译不通过，需修改或重生成 |
+| 重试策略 | 人在同一轮对话中追问 → AI修正输出 | 修改提示词约束 → 让Agent重新生成 → 对比两个版本 |
+
+选型判断框架——接到一个任务时，问三个问题：
+Q1: 这个任务需要人做创造性决策吗？（是→LLM Chat / 否→Agent候选）
+Q2: 这个任务涉及 ≥3 个已有文件的上下文吗？（是→Agent优势明显 / 否→LLM Chat即可）
+Q3: 这个任务的输出可以自动验证吗（编译/测试/格式检查）？（是→Agent / 否→LLM Chat）
+

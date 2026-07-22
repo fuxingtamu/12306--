@@ -1,0 +1,252 @@
+<mxfile host="Electron">
+  <diagram name="分析类图" id="iMVuZClNjmuUA8rvkcCl">
+    <mxGraphModel dx="589" dy="413" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="950" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=18;fontStyle=1" value="12306旅客管理系统 — 分析类图（MVP：乘车人 + 车票查询）" vertex="1">
+          <mxGeometry height="28" width="620" x="220" y="8" as="geometry" />
+        </mxCell>
+        <mxCell id="b1" parent="1" style="swimlane;fontStyle=1;align=center;startSize=24;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="LoginUI" vertex="1">
+          <mxGeometry height="64" width="150" x="40" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="b1m" parent="b1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="+displayLogin()&#xa;+validateInput()" vertex="1">
+          <mxGeometry height="36" width="150" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="b2" parent="1" style="swimlane;fontStyle=1;align=center;startSize=24;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" value="PassengerListUI" vertex="1">
+          <mxGeometry height="76" width="150" x="210" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="b2m" parent="b2" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="+displayPassengers()&#xa;+confirmDelete()&#xa;+navigateToAdd()" vertex="1">
+          <mxGeometry height="48" width="150" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="b3" parent="1" style="swimlane;fontStyle=1;align=center;startSize=24;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" value="PassengerFormUI" vertex="1">
+          <mxGeometry height="76" width="150" x="380" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="b3m" parent="b3" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="+displayForm()&#xa;+submitPassenger()&#xa;+selectIDType()" vertex="1">
+          <mxGeometry height="48" width="150" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="b4" parent="1" style="swimlane;fontStyle=1;align=center;startSize=24;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" value="TrainQueryUI" vertex="1">
+          <mxGeometry height="88" width="150" x="550" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="b4m" parent="b4" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="+selectStation()&#xa;+queryTrains()&#xa;+displayResults()&#xa;+filterTrains()" vertex="1">
+          <mxGeometry height="60" width="150" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="b5" parent="1" style="swimlane;fontStyle=1;align=center;startSize=24;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" value="StationSelectorUI" vertex="1">
+          <mxGeometry height="68" width="150" x="720" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="b5m" parent="b5" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="+searchStation(keyword)&#xa;+displaySuggestions()" vertex="1">
+          <mxGeometry height="38" width="150" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="c1" parent="1" style="swimlane;fontStyle=1;align=center;startSize=24;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" value="AuthController" vertex="1">
+          <mxGeometry height="60" width="160" x="35" y="172" as="geometry" />
+        </mxCell>
+        <mxCell id="c1m" parent="c1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="+login(phone, password)" vertex="1">
+          <mxGeometry height="18" width="160" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" parent="1" style="swimlane;fontStyle=1;align=center;startSize=24;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" value="PassengerController" vertex="1">
+          <mxGeometry height="90" width="160" x="215" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="c2m" parent="c2" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="+addPassenger(dto)&#xa;+deletePassenger(id)&#xa;+updatePassenger(dto)&#xa;+listByUser(userId)" vertex="1">
+          <mxGeometry height="62" width="160" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" parent="1" style="swimlane;fontStyle=1;align=center;startSize=28;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" value="TrainController&#xa;StationController" vertex="1">
+          <mxGeometry height="92" width="165" x="395" y="168" as="geometry" />
+        </mxCell>
+        <mxCell id="c3m" parent="c3" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fontSize=9;" value="+queryTrains(dto)&#xa;+searchStation(keyword)&#xa;+getTrainDetail(id)" vertex="1">
+          <mxGeometry height="58" width="165" y="28" as="geometry" />
+        </mxCell>
+        <mxCell id="s1" parent="1" style="swimlane;fontStyle=1;align=center;startSize=24;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" value="UserService" vertex="1">
+          <mxGeometry height="72" width="160" x="35" y="295" as="geometry" />
+        </mxCell>
+        <mxCell id="s1m" parent="s1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="+login(account, password)&#xa;+verifyValidity(account, pw)&#xa;+generateJWT(user)" vertex="1">
+          <mxGeometry height="44" width="160" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="s2" parent="1" style="swimlane;fontStyle=1;align=center;startSize=24;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" value="PassengerService" vertex="1">
+          <mxGeometry height="86" width="160" x="215" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="s2m" parent="s2" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="+addPassenger(uid, dto)&#xa;+deletePassenger(uid, pid)&#xa;+checkUnique(type, num)&#xa;+countByUserId(uid)" vertex="1">
+          <mxGeometry height="58" width="160" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="s3" parent="1" style="swimlane;fontStyle=1;align=center;startSize=28;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" value="TrainService&#xa;StationService" vertex="1">
+          <mxGeometry height="94" width="165" x="395" y="287" as="geometry" />
+        </mxCell>
+        <mxCell id="s3m" parent="s3" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fontSize=9;" value="+queryTrains(dto)&#xa;+searchStation(keyword)&#xa;+generateSeatInfo(train)" vertex="1">
+          <mxGeometry height="58" width="165" y="28" as="geometry" />
+        </mxCell>
+        <mxCell id="s4" parent="1" style="swimlane;fontStyle=1;align=center;startSize=24;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" value="JwtAuthFilter" vertex="1">
+          <mxGeometry height="62" width="145" x="590" y="295" as="geometry" />
+        </mxCell>
+        <mxCell id="s4m" parent="s4" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="+doFilter(req, resp)&#xa;+parseToken(header)" vertex="1">
+          <mxGeometry height="34" width="145" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="s5" parent="1" style="swimlane;fontStyle=1;align=center;startSize=28;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" value="GlobalException&#xa;Handler" vertex="1">
+          <mxGeometry height="66" width="140" x="755" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="s5m" parent="s5" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;fontSize=9;" value="+handleBusinessEx(ex)" vertex="1">
+          <mxGeometry height="18" width="140" y="28" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" parent="1" style="swimlane;fontStyle=1;align=center;startSize=26;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" value="User" vertex="1">
+          <mxGeometry height="130" width="170" x="55" y="415" as="geometry" />
+        </mxCell>
+        <mxCell id="e1l1" parent="e1" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;rotatable=0;labelPosition=left;points=[];portConstraint=eastwest;strokeColor=#82b366;" value="" vertex="1">
+          <mxGeometry height="8" width="170" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e1a" parent="e1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="- id: Long&#xa;- username: String&#xa;- password: String (bcrypt)&#xa;- phone: String&#xa;- isVerified: Integer" vertex="1">
+          <mxGeometry height="70" width="170" y="34" as="geometry" />
+        </mxCell>
+        <mxCell id="e1l2" parent="e1" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;rotatable=0;labelPosition=left;points=[];portConstraint=eastwest;strokeColor=#82b366;" value="" vertex="1">
+          <mxGeometry height="8" width="170" y="104" as="geometry" />
+        </mxCell>
+        <mxCell id="e1m" parent="e1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="" vertex="1">
+          <mxGeometry height="14" width="170" y="112" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" parent="1" style="swimlane;fontStyle=1;align=center;startSize=26;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" value="Passenger" vertex="1">
+          <mxGeometry height="148" width="170" x="255" y="415" as="geometry" />
+        </mxCell>
+        <mxCell id="e2l1" parent="e2" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;rotatable=0;labelPosition=left;points=[];portConstraint=eastwest;strokeColor=#82b366;" value="" vertex="1">
+          <mxGeometry height="8" width="170" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e2a" parent="e2" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="- id: Long&#xa;- userId: Long&#xa;- lastName: String&#xa;- firstName: String&#xa;- idType: String&#xa;- idNumber: String&#xa;- phone: String&#xa;- status: Integer" vertex="1">
+          <mxGeometry height="96" width="170" y="34" as="geometry" />
+        </mxCell>
+        <mxCell id="e2l2" parent="e2" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;rotatable=0;labelPosition=left;points=[];portConstraint=eastwest;strokeColor=#82b366;" value="" vertex="1">
+          <mxGeometry height="8" width="170" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="e2m" parent="e2" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="" vertex="1">
+          <mxGeometry height="6" width="170" y="138" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" parent="1" style="swimlane;fontStyle=1;align=center;startSize=26;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" value="Train" vertex="1">
+          <mxGeometry height="128" width="170" x="455" y="415" as="geometry" />
+        </mxCell>
+        <mxCell id="e3l1" parent="e3" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;rotatable=0;labelPosition=left;points=[];portConstraint=eastwest;strokeColor=#82b366;" value="" vertex="1">
+          <mxGeometry height="8" width="170" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e3a" parent="e3" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="- id: Long&#xa;- trainCode: String (G101)&#xa;- trainType: Integer&#xa;- startStationName: String&#xa;- endStationName: String&#xa;- totalTime: Integer" vertex="1">
+          <mxGeometry height="78" width="170" y="34" as="geometry" />
+        </mxCell>
+        <mxCell id="e3l2" parent="e3" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;rotatable=0;labelPosition=left;points=[];portConstraint=eastwest;strokeColor=#82b366;" value="" vertex="1">
+          <mxGeometry height="8" width="170" y="112" as="geometry" />
+        </mxCell>
+        <mxCell id="e3m" parent="e3" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="" vertex="1">
+          <mxGeometry height="4" width="170" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" parent="1" style="swimlane;fontStyle=1;align=center;startSize=26;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" value="Station" vertex="1">
+          <mxGeometry height="120" width="170" x="655" y="418" as="geometry" />
+        </mxCell>
+        <mxCell id="e4l1" parent="e4" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;rotatable=0;labelPosition=left;points=[];portConstraint=eastwest;strokeColor=#82b366;" value="" vertex="1">
+          <mxGeometry height="8" width="170" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="e4a" parent="e4" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="- id: Long&#xa;- stationCode: String&#xa;- stationName: String&#xa;- cityName: String&#xa;- pinyin: String" vertex="1">
+          <mxGeometry height="64" width="170" y="34" as="geometry" />
+        </mxCell>
+        <mxCell id="e4l2" parent="e4" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;rotatable=0;labelPosition=left;points=[];portConstraint=eastwest;strokeColor=#82b366;" value="" vertex="1">
+          <mxGeometry height="8" width="170" y="98" as="geometry" />
+        </mxCell>
+        <mxCell id="e4m" parent="e4" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=9;" value="" vertex="1">
+          <mxGeometry height="10" width="170" y="106" as="geometry" />
+        </mxCell>
+        <mxCell id="eid" parent="1" style="swimlane;fontStyle=1;align=center;startSize=24;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" value="«enum» IDType" vertex="1">
+          <mxGeometry height="74" width="155" x="270" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="eidl" parent="eid" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;rotatable=0;labelPosition=left;points=[];portConstraint=eastwest;strokeColor=#9673a6;" value="" vertex="1">
+          <mxGeometry height="8" width="155" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="eida" parent="eid" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingTop=2;fontSize=8;" value="ID_CARD, HK_MACAO,&#xa;TAIWAN, FOREIGN_PERM,&#xa;PASSPORT..." vertex="1">
+          <mxGeometry height="38" width="155" y="32" as="geometry" />
+        </mxCell>
+        <mxCell id="sub1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;fontStyle=1;" value="Admin" vertex="1">
+          <mxGeometry height="32" width="70" x="54" y="572" as="geometry" />
+        </mxCell>
+        <mxCell id="sub2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;fontStyle=1;" value="NormalUser" vertex="1">
+          <mxGeometry height="32" width="85" x="149" y="572" as="geometry" />
+        </mxCell>
+        <mxCell id="r1" edge="1" parent="1" source="b1" style="endArrow=open;dashed=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#666666;" target="c1" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r2" edge="1" parent="1" source="b2" style="endArrow=open;dashed=1;exitX=0.5;exitY=1;entryX=0.35;entryY=0;strokeColor=#666666;" target="c2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r3" edge="1" parent="1" source="b3" style="endArrow=open;dashed=1;exitX=0.5;exitY=1;entryX=0.65;entryY=0;strokeColor=#666666;" target="c2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r4" edge="1" parent="1" source="b4" style="endArrow=open;dashed=1;exitX=0.5;exitY=1;entryX=0.4;entryY=0;strokeColor=#666666;" target="c3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r5" edge="1" parent="1" source="b5" style="endArrow=open;dashed=1;exitX=0.5;exitY=1;entryX=0.7;entryY=0;strokeColor=#666666;" target="c3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r6" edge="1" parent="1" source="c1" style="endArrow=open;dashed=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#d79b00;" target="s1" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r7" edge="1" parent="1" source="c2" style="endArrow=open;dashed=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#d79b00;" target="s2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r8" edge="1" parent="1" source="c3" style="endArrow=open;dashed=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#d79b00;entryDx=0;entryDy=0;" target="s3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r9" edge="1" parent="1" source="s1" style="endArrow=open;dashed=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#82b366;" target="e1" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r10" edge="1" parent="1" source="s2" style="endArrow=open;dashed=1;exitX=0.5;exitY=1;entryX=0.3;entryY=0;strokeColor=#82b366;" target="e2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r11" edge="1" parent="1" source="s3" style="endArrow=open;dashed=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#82b366;" target="e3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r12" edge="1" parent="1" source="s3" style="endArrow=open;dashed=1;exitX=0.85;exitY=1;entryX=0.5;entryY=0;strokeColor=#82b366;" target="e4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r13" edge="1" parent="1" source="e1a" style="endArrow=ERoneToMany;startArrow=ERmandOne;strokeColor=#333333;exitX=0.998;exitY=0.298;exitDx=0;exitDy=0;exitPerimeter=0;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="225" y="468" as="sourcePoint" />
+            <mxPoint x="250" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r14" edge="1" parent="1" style="endArrow=open;dashed=1;entryX=0.457;entryY=0.017;strokeColor=#9673a6;entryDx=0;entryDy=0;entryPerimeter=0;" target="eid" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="340" y="560" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r15" edge="1" parent="1" source="e3" style="endArrow=ERoneToMany;startArrow=ERmandOne;exitX=1;exitY=0.4;entryX=0;entryY=0.4;strokeColor=#333333;" target="e4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ri1" edge="1" parent="1" source="e1" style="endArrow=block;endFill=0;dashed=0;exitX=0.2;exitY=1;entryX=0.5;entryY=0;strokeColor=#333333;" target="sub1" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ri2" edge="1" parent="1" source="e1" style="endArrow=block;endFill=0;dashed=0;exitX=0.8;exitY=1;entryX=0.5;entryY=0;strokeColor=#333333;" target="sub2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="legbox" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;strokeWidth=1;" value="" vertex="1">
+          <mxGeometry height="180" width="175" x="850" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="legt" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=11;fontStyle=1;" value="图例" vertex="1">
+          <mxGeometry height="16" width="165" x="855" y="433" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;color=#6c8ebf;" value="■ 边界类 Boundary（前端UI）" vertex="1">
+          <mxGeometry height="15" width="165" x="858" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;color=#d6b656;" value="■ 控制类 Control（后端逻辑）" vertex="1">
+          <mxGeometry height="15" width="165" x="858" y="468" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;color=#82b366;" value="■ 实体类 Entity（数据模型）" vertex="1">
+          <mxGeometry height="15" width="165" x="858" y="486" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;color=#9673a6;" value="■ 辅助类 Auxiliary（拦截器等）" vertex="1">
+          <mxGeometry height="15" width="165" x="858" y="504" as="geometry" />
+        </mxCell>
+        <mxCell id="leg5" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;color=#666666;" value="- - - 依赖关系 Dependency" vertex="1">
+          <mxGeometry height="15" width="165" x="858" y="525" as="geometry" />
+        </mxCell>
+        <mxCell id="leg6" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;color=#333333;" value="──── 关联关系 Association" vertex="1">
+          <mxGeometry height="15" width="165" x="858" y="543" as="geometry" />
+        </mxCell>
+        <mxCell id="leg7" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;color=#333333;" value="△── 继承关系 Inheritance" vertex="1">
+          <mxGeometry height="15" width="165" x="858" y="561" as="geometry" />
+        </mxCell>
+        <mxCell id="leg8" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;color=#9673a6;" value="«enum» 枚举类型" vertex="1">
+          <mxGeometry height="15" width="165" x="858" y="579" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

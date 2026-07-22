@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio" version="26.0.0">
+  <diagram name="用户登录">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="720" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <!-- 标题 -->
+        <mxCell id="t3" value="时序图：用户登录认证（JWT 单 token 签发）" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=18;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="300" y="8" width="520" height="30" as="geometry" />
+        </mxCell>
+        <!-- 生命线（center X：用户=105, 前端=280, Controller=475, Service=670, Mapper=845, MySQL=1010） -->
+        <mxCell id="lg_u" value="用户" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=11;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="60" y="50" width="90" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="lg_fe" value="Login.vue" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=10;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="230" y="50" width="100" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="lg_c" value="AuthController" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=10;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="420" y="50" width="110" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="lg_s" value="UserService" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=10;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="620" y="50" width="100" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="lg_m" value="UserMapper" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=10;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="800" y="50" width="90" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="lg_db" value="MySQL" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=10;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="970" y="50" width="80" height="600" as="geometry" />
+        </mxCell>
+
+        <!-- 消息箭头：绝对坐标，X=生命线中心，Y递增 ~35px -->
+        <!-- 1. 用户 → 前端 -->
+        <mxCell id="a1" value="1. 输入手机号+密码 → 点击「登录」" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="105" y="110" as="sourcePoint"/><mxPoint x="280" y="110" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 2. 前端 → 用户：格式校验返回 -->
+        <mxCell id="a2" value="2. 前端格式校验（11位手机号 / 密码非空）" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#999;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="280" y="145" as="sourcePoint"/><mxPoint x="105" y="145" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 3. 前端 → Controller：HTTP请求 -->
+        <mxCell id="a3" value="3. POST /api/auth/login {phone, password} (无 JWT)" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;strokeColor=#d79b00;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="280" y="182" as="sourcePoint"/><mxPoint x="475" y="182" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 4. Controller → Service：调用login方法 -->
+        <mxCell id="a4" value="4. login(phone, password)" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="475" y="220" as="sourcePoint"/><mxPoint x="670" y="220" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 5. Service → Mapper：SQL查询 -->
+        <mxCell id="a5" value="5. SELECT * FROM users WHERE phone=? AND status=1" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;strokeColor=#82b366;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="670" y="258" as="sourcePoint"/><mxPoint x="845" y="258" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 6. Mapper → MySQL：执行查询 -->
+        <mxCell id="a6" value="6. 查询" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=9;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="845" y="293" as="sourcePoint"/><mxPoint x="1010" y="293" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 7. MySQL → Mapper：返回记录（修复：先回到Mapper） -->
+        <mxCell id="a7" value="7. 返回 User 记录" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#82b366;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="1010" y="328" as="sourcePoint"/><mxPoint x="845" y="328" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 8. Mapper → Service：返回User实体（新增中间返回） -->
+        <mxCell id="a8" value="8. 返回 User 实体" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#999;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="845" y="360" as="sourcePoint"/><mxPoint x="670" y="360" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 9. Service 自调用：bcrypt密码比对 -->
+        <mxCell id="a9" value="9. bcrypt.matches(password, user.password) → ✓ 匹配" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;strokeColor=#9673a6;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="670" y="400" as="sourcePoint"/><mxPoint x="670" y="430" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 10. Service 自调用：JWT签发 -->
+        <mxCell id="a10" value="10. JWT.sign({sub:userId, username}, secret, 24h)" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;strokeColor=#9673a6;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="670" y="450" as="sourcePoint"/><mxPoint x="670" y="480" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 11. Service → Controller：返回LoginVO（修复：不再跨层直连前端） -->
+        <mxCell id="a11" value="11. 返回 LoginVO {token, userId, username}" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#999;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="670" y="518" as="sourcePoint"/><mxPoint x="475" y="518" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 12. Controller → 前端：HTTP响应（修复：从Controller发出而非Service） -->
+        <mxCell id="a12" value="12. Result{code:200, data: LoginVO}" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#d79b00;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="475" y="555" as="sourcePoint"/><mxPoint x="280" y="555" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 13. 前端 → 用户：存储token并跳转 -->
+        <mxCell id="a13" value="13. localStorage.set('token') + Pinia + redirect /" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;strokeColor=#52c41a;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="280" y="592" as="sourcePoint"/><mxPoint x="105" y="592" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 注释框 -->
+        <mxCell id="note3" value="设计要点：&#xa;• 密码 bcrypt 加密存储&#xa;• JWT 单 token，24h 过期&#xa;• Axios 拦截器自动带&#xa;  Authorization: Bearer xxx&#xa;• JwtAuthFilter 每次请求校验&#xa;  解析 token→注入 UserPrincipal" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="72" width="200" height="115" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

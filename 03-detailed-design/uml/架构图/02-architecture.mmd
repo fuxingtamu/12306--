@@ -1,0 +1,68 @@
+%% 架构图：前后端分离架构
+graph TB
+    subgraph "客户端层 (Client Layer)"
+        WEB["Web浏览器"]
+        APP["移动App"]
+    end
+
+    subgraph "前端层 (Frontend Layer)"
+        direction TB
+        NG["Nginx反向代理"]
+        VUE["Vue3应用"]
+        PIN["Pinia状态管理"]
+        AX["Axios HTTP客户端"]
+    end
+
+    subgraph "网关层 (Gateway Layer)"
+        GW["Spring Cloud Gateway"]
+    end
+
+    subgraph "后端服务层 (Backend Layer)"
+        direction TB
+        AUTH["认证服务 :8080"]
+        USER["用户服务 :8081"]
+        PASS["旅客服务 :8082"]
+        TRAIN["车次服务 :8083"]
+        ORDER["订单服务 :8084"]
+        PAY["支付服务 :8085"]
+    end
+
+    subgraph "数据层 (Data Layer)"
+        direction TB
+        MYSQL[("MySQL 8.0")]
+        REDIS[("Redis 缓存")]
+    end
+
+    subgraph "外部服务 (External Services)"
+        PAY_PLATFORM["支付宝/微信支付"]
+        GOV_API["实名认证API"]
+    end
+
+    %% 连接关系
+    WEB --> NG
+    APP --> NG
+    NG --> VUE
+    VUE --> AX
+    AX --> GW
+    GW --> AUTH
+    GW --> USER
+    GW --> PASS
+    GW --> TRAIN
+    GW --> ORDER
+
+    AUTH --> REDIS
+    USER --> MYSQL
+    PASS --> MYSQL
+    TRAIN --> MYSQL
+    TRAIN --> REDIS
+    ORDER --> MYSQL
+    ORDER --> REDIS
+    ORDER --> PAY
+    PAY --> PAY_PLATFORM
+    USER --> GOV_API
+
+    %% 样式
+    style NG fill:#e1f5fe
+    style GW fill:#fff3e0
+    style MYSQL fill:#f3e5f5
+    style REDIS fill:#f3e5f5

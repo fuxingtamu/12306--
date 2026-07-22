@@ -22,58 +22,42 @@
 - MySQL 8.0 数据库
 - Redis 缓存
 
-## 项目结构
+## 项目结构（按SDLC生命周期组织）
 
 ```
 12306旅客管理/
-├── docs/                    # 文档目录
-│   ├── 开发计划.md          # 开发计划
-│   ├── requirements/        # 需求文档
-│   ├── design/             # 设计文档
-│   ├── api/                 # API文档
-│   ├── test/                # 测试文档
-│   └── deploy/              # 部署文档
-├── frontend/                # 前端项目
-├── backend/                 # 后端项目
-├── database/                # 数据库脚本
-│   ├── schema.sql          # 数据库结构
-│   └── data.sql            # 初始化数据
+├── 01-requirements/              # 需求阶段
+│   ├── 软件需求规格说明书.md       # SRS
+│   └── user-stories/             # User Story
+├── 02-architecture/              # 架构设计
+│   ├── 软件架构设计文档.md         # SAD
+│   └── adr/                      # 架构决策记录
+├── 03-detailed-design/           # 详细设计
+│   ├── 数据库设计文档.md
+│   ├── API设计文档.md
+│   └── uml/                      # UML图集（用例/顺序/类/状态/ER/组件/架构/部署/活动）
+├── 04-implementation/            # 实现阶段
+├── 05-testing/                   # 测试阶段
+│   ├── 测试计划.md
+│   ├── 测试用例/
+│   └── 测试报告.md
+├── 06-deployment/                # 部署阶段
+│   └── 部署手册.md
+│   ├── backend/                  # 后端源码（Spring Boot）
+│   └── frontend/                 # 前端源码（Vue 3）
+├── database/                     # 数据库脚本与原始数据
+├── cases/                        # AI辅助开发教学案例
 └── README.md
 ```
 
 ## 功能模块
 
-### 用户模块
-- 用户注册/登录
-- JWT认证
-- 实名认证
-- 个人信息管理
-
-### 旅客管理模块
-- 常用联系人管理
-- 添加/编辑/删除旅客
-- 旅客类型（成人/儿童/学生/残军）
-
-### 车票查询模块
-- 站站查询
-- 车次查询
-- 余票查询
-- 筛选排序
-
-### 购票模块
-- 选座购票
-- 在线支付模拟
-- 购票限制
-
-### 订单管理模块
-- 未完成/已完成订单
-- 改签功能
-- 退票功能
-
-### 候补购票模块
-- 候补下单
-- 候补状态查询
-- 自动兑现
+### 已实现
+- 车票查询（站站查询、余票查询、筛选排序）
+- 乘车人管理（添加/修改/删除/查询，8种证件类型支持）
+- 车站查询（模糊搜索）
+- 用户认证（注册/登录、JWT令牌）
+- 订单管理（创建/查询）
 
 ## 快速开始
 
@@ -81,35 +65,34 @@
 - JDK 17+
 - Node.js 18+
 - MySQL 8.0+
-- Redis 6.0+
+- Redis 7.0+
 
 ### 数据库初始化
 ```bash
-mysql -u root -p < database/schema.sql
-mysql -u root -p railway_system < database/data.sql
+mysql -u root -p -e "CREATE DATABASE railway DEFAULT CHARSET utf8mb4;"
+mysql -u root -p railway < database/schema.sql
+mysql -u root -p railway < database/stations_data.sql
+mysql -u root -p railway < database/trains_import.sql
+mysql -u root -p railway < database/train_stops_import.sql
 ```
 
 ### 后端启动
 ```bash
-cd backend
+cd 04-implementation/backend
 mvn spring-boot:run
 ```
 
 ### 前端启动
 ```bash
-cd frontend
+cd 04-implementation/frontend
 npm install
 npm run dev
+# 访问 http://localhost:3000
 ```
 
-## 部署说明
+## 部署
 
-- 前端部署：Gitee Pages
-- 后端部署：云服务器
-
-## 开发进度
-
-详见 [开发计划.md](docs/开发计划.md)
+详见 [06-deployment/部署手册.md](06-deployment/部署手册.md)
 
 ## License
 

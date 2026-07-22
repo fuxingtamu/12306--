@@ -1,0 +1,75 @@
+%% 时序图：购票流程
+sequenceDiagram
+    autonumber
+    participant U as 用户
+    participant FE as 前端
+    participant GW as 网关
+    participant ORD as 订单服务
+    participant TKT as 票务服务
+    participant PAY as 支付服务
+    participant DB as 数据库
+
+    %% 1. 查询余票
+    U->>FE: 选择车次、日期
+    FE->>GW: GET /trains/{id}/inventory?date=xxx
+    GW->>TKT: 查询余票
+    TKT->>DB: SELECT available_seats
+    DB-->>TKT: 返回余票信息
+    TKT-->>GW: 返回余票
+    GW-->>FE: 返回余票
+    FE-->>U: 显示余票
+
+    %% 2. 选择乘客
+    U->>FE: 选择乘客(1-4人)
+    FE->>GW: GET /passengers?userId=xxx
+    GW->>DB: SELECT passengers
+    DB-->>GW: 返回旅客列表
+    GW-->>FE: 返回旅客列表
+    FE-->>U: 显示旅客选择
+
+    %% 3. 选择座位
+    U->>FE: 选择座位
+    FE-->>U: 显示座位图
+
+    %% 4. 锁定座位
+    FE->>GW: POST /inventory/lock
+    GW->>TKT: 锁定座位
+    TKT->>DB: UPDATE inventory SET available_seats - 1
+    Note over TKT,DB: 锁定10分钟有效期
+    DB-->>TKT: 锁定成功
+    TKT-->>GW: 返回锁订单号
+    GW-->>FE: 返回锁订单号
+    FE-->>U: 显示锁定成功
+
+    %% 5. 创建订单
+    U->>FE: 确认订单
+    FE->>GW: POST /orders
+    GW->>ORD: 创建订单
+    ORD->>DB: INSERT orders, order_items
+    DB-->>ORD: 订单创建成功
+    ORD-->>GW: 返回订单号
+    GW-->>FE: 返回订单号
+    FE-->>U: 显示待支付订单
+
+    %% 6. 支付
+    U->>FE: 点击支付
+    FE->>GW: POST /orders/{id}/pay
+    GW->>PAY: 创建支付单
+    PAY-->>GW: 返回支付链接
+    GW-->>FE: 返回支付链接
+    FE-->>U: 跳转支付页面
+
+    rect rgb(200, 230, 200)
+        Note over U,PAY: 第三方支付
+        U->>PAY: 完成支付
+        PAY-->>GW: 支付回调
+    end
+
+    GW->>ORD: 更新订单状态
+    ORD->>DB: UPDATE order SET status='PAID'
+    ORD->>TKT: 确认出票
+    TKT->>DB: UPDATE inventory SET sold_seats + 1
+    DB-->>ORD: 出票成功
+    ORD-->>GW: 订单完成
+    GW-->>FE: 支付成功
+    FE-->>U: 显示购票成功

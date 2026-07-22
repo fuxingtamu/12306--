@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio" version="26.0.0">
+  <diagram name="车票查询">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <!-- 标题 -->
+        <mxCell id="t2" value="时序图：车票查询（18 参数筛选 + 随机余票生成）" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=18;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="280" y="10" width="600" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ===== 阶段分隔标题 ===== -->
+        <mxCell id="phase1-label" value="【阶段一】出发站/到达站 选择（模糊搜索子流程）" style="text;html=1;strokeColor=none;fillColor=#e8f5e9;fontSize=11;fontStyle=1;fontColor=#2e7d32;align=center;" vertex="1" parent="1">
+          <mxGeometry x="300" y="45" width="420" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- 生命线（center X：用户=85, 前端=250, Controller=445, Service=645, Mapper=840, MySQL=1010） -->
+        <mxCell id="lu2" value="用户" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=11;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="72" width="90" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="lfe2" value="Home.vue→&#xa;TicketQuery.vue" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=9;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="190" y="72" width="120" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="lc2" value="TrainController&#xa;+ StationController" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=9;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="380" y="72" width="130" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="ls2" value="TrainService&#xa;+ StationService" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=9;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="580" y="72" width="130" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="lm2" value="TrainMapper&#xa;TrainStopMapper" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=9;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="780" y="72" width="120" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="ldb2" value="MySQL" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=10;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="970" y="72" width="80" height="900" as="geometry" />
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- 阶段一：选站子流程 (y: 130 ~ 230)                                -->
+        <!-- ============================================================ -->
+        <mxCell id="q1" value="1. 输入出发站关键字 → 触发模糊搜索" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="85" y="130" as="sourcePoint"/><mxPoint x="250" y="130" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q1b" value="2. GET /api/stations/search?keyword=北京" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;strokeColor=#9673a6;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="250" y="162" as="sourcePoint"/><mxPoint x="445" y="162" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q1c" value="3. searchStation(keyword)" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="445" y="192" as="sourcePoint"/><mxPoint x="645" y="192" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q1d" value="4. SELECT station_name FROM stations&#xa;   WHERE station_name LIKE '%北京%'" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=9;strokeColor=#82b366;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="645" y="225" as="sourcePoint"/><mxPoint x="840" y="225" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q1e" value="5. 查询" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=9;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="840" y="258" as="sourcePoint"/><mxPoint x="1010" y="258" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q1f" value="6. 返回候选站列表" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#82b366;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="1010" y="290" as="sourcePoint"/><mxPoint x="645" y="290" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q1g" value="7. 返回 List&lt;StationVO&gt;" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#999;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="645" y="320" as="sourcePoint"/><mxPoint x="445" y="320" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q1h" value="8. Result{code:200, data: List}" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#9673a6;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="445" y="350" as="sourcePoint"/><mxPoint x="250" y="350" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q2" value="9. 展示下拉候选站 → 用户选择出发站/到达站 + 日期" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;strokeColor=#52c41a;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="250" y="385" as="sourcePoint"/><mxPoint x="85" y="385" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 阶段一分隔线 -->
+        <mxCell id="sep-phase" value="" style="line;strokeWidth=1;strokeColor=#81c784;dashed=1;dashPattern=6 3;" vertex="1" parent="1">
+          <mxGeometry x="30" y="415" width="1040" height="1" as="geometry" />
+        </mxCell>
+
+        <!-- 阶段二标题 -->
+        <mxCell id="phase2-label" value="【阶段二】主查询流程（查询车次 + 余票生成 + 渲染）" style="text;html=1;strokeColor=none;fillColor=#fff3e0;fontSize=11;fontStyle=1;fontColor=#ef6c00;align=center;" vertex="1" parent="1">
+          <mxGeometry x="310" y="422" width="450" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- 阶段二：主查询流程 (y: 455 ~ 720)                               -->
+        <!-- ============================================================ -->
+        <mxCell id="q3" value="10. 点击「查询车票」按钮" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="85" y="455" as="sourcePoint"/><mxPoint x="250" y="455" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q4" value="11. POST /api/trains/query {from,to,date,18params} + JWT" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;strokeColor=#d79b00;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="250" y="490" as="sourcePoint"/><mxPoint x="445" y="490" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q5" value="12. queryTrains(dto)" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="445" y="523" as="sourcePoint"/><mxPoint x="645" y="523" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q6" value="13. LambdaQueryWrapper 动态拼接 WHERE" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;strokeColor=#82b366;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="645" y="555" as="sourcePoint"/><mxPoint x="840" y="555" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q7" value="14. SELECT ... FROM trains t&#xa;    JOIN train_stops ts ... WHERE ..." style="html=1;verticalAlign=bottom;endArrow=block;fontSize=9;strokeColor=#82b366;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="840" y="595" as="sourcePoint"/><mxPoint x="1010" y="595" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q8" value="15. 返回 Train 列表（4458条中筛选）" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#82b366;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="1010" y="635" as="sourcePoint"/><mxPoint x="840" y="635" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q9" value="16. 返回 List&lt;Train&gt;" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#999;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="840" y="667" as="sourcePoint"/><mxPoint x="645" y="667" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q10" value="17. 遍历 → Random(0~500) 生成每席别余票&#xa;     按车次类型映射 (G→商务/一等/二等/无座)" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;strokeColor=#d79b00;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="645" y="707" as="sourcePoint"/><mxPoint x="645" y="742" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q11" value="18. 组装 List&lt;TrainVO&gt; 返回" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#999;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="645" y="777" as="sourcePoint"/><mxPoint x="445" y="777" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q12" value="19. Result{code:200, data: List&lt;TrainVO&gt;}" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#d79b00;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="445" y="810" as="sourcePoint"/><mxPoint x="250" y="810" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q13" value="20. 渲染车次卡片（车次号/时间/历时/余票）" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;strokeColor=#52c41a;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="250" y="848" as="sourcePoint"/><mxPoint x="85" y="848" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!-- 阶段三：筛选（可选后续）                                       -->
+        <!-- ============================================================ -->
+        <mxCell id="q14" value="21. [可选] 展开筛选面板 → 选类型/席别/时段" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;strokeColor=#9673a6;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="85" y="888" as="sourcePoint"/><mxPoint x="250" y="888" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="q15" value="22. 筛选即时生效（前端过滤）或重新 post query" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#9673a6;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="250" y="920" as="sourcePoint"/><mxPoint x="85" y="920" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 注释框 -->
+        <mxCell id="note2" value="设计要点：&#xa;• stop_order_A &lt; stop_order_B 匹配经停&#xa;• 18 参数用 LambdaQueryWrapper&#xa;  动态拼接，NULL 自动忽略&#xa;• 余票 Random (0~500)，不查 DB&#xa;• 席别按车次类型映射&#xa;• 不分页，全部返回&#xa;• 游标分页后续迭代加入" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="80" width="200" height="145" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

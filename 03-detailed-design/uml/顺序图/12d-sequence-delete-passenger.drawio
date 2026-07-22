@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio" version="26.0.0">
+  <diagram name="删除乘车人">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <!-- 标题 -->
+        <mxCell id="t4" value="时序图：删除乘车人（软删除 + 跨用户校验）" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=18;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="300" y="10" width="520" height="30" as="geometry" />
+        </mxCell>
+        <!-- 生命线（center X：用户=105, 前端=280, Controller=480, Service=675, Mapper=865, MySQL=1040） -->
+        <mxCell id="ld_u" value="用户" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=11;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="60" y="50" width="90" height="550" as="geometry" />
+        </mxCell>
+        <mxCell id="ld_fe" value="Passengers-Mobile.vue" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=10;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="220" y="50" width="120" height="550" as="geometry" />
+        </mxCell>
+        <mxCell id="ld_c" value="PassengerController" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=10;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="420" y="50" width="120" height="550" as="geometry" />
+        </mxCell>
+        <mxCell id="ld_s" value="PassengerService" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=10;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="620" y="50" width="110" height="550" as="geometry" />
+        </mxCell>
+        <mxCell id="ld_m" value="PassengerMapper" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=10;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="810" y="50" width="110" height="550" as="geometry" />
+        </mxCell>
+        <mxCell id="ld_db" value="MySQL" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;outlineConnect=0;fontSize=10;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="50" width="80" height="550" as="geometry" />
+        </mxCell>
+
+        <!-- 消息箭头：绝对坐标，X=生命线中心，Y递增 ~35px -->
+        <!-- 1. 用户 → 前端 -->
+        <mxCell id="d1" value="1. 点击乘车人进入编辑页 → 点击「删除」" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="105" y="108" as="sourcePoint"/><mxPoint x="280" y="108" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 2. 前端 → 用户：确认弹窗 -->
+        <mxCell id="d2" value="2. ElMessageBox.confirm(&quot;确定删除乘车人 XXX ?&quot;)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#ff4444;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="280" y="145" as="sourcePoint"/><mxPoint x="105" y="145" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 3. 前端 → Controller：DELETE请求 -->
+        <mxCell id="d3" value="3. 用户确认 → DELETE /api/passengers/{id} + JWT" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;strokeColor=#ff4444;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="280" y="185" as="sourcePoint"/><mxPoint x="480" y="185" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 4. Controller → Service -->
+        <mxCell id="d4" value="4. deletePassenger(userId, passengerId)" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="480" y="222" as="sourcePoint"/><mxPoint x="675" y="222" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 5. Service → Mapper：校验归属 -->
+        <mxCell id="d5" value="5. 校验：passenger 属于当前 user?" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;strokeColor=#9673a6;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="675" y="260" as="sourcePoint"/><mxPoint x="865" y="260" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 6. Mapper → Service：返回校验结果（新增） -->
+        <mxCell id="d6" value="6. 返回 Passenger 实体 / null" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#999;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="865" y="295" as="sourcePoint"/><mxPoint x="675" y="295" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 7. Service → Mapper：执行软删除SQL -->
+        <mxCell id="d7" value="7. UPDATE passengers SET status=0&#xa;   WHERE id=? AND user_id=? (@TableLogic)" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;strokeColor=#ff4444;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="675" y="338" as="sourcePoint"/><mxPoint x="865" y="338" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 8. Mapper → MySQL：执行更新 -->
+        <mxCell id="d8" value="8. 执行 UPDATE" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=9;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="865" y="377" as="sourcePoint"/><mxPoint x="1040" y="377" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 9. MySQL → Mapper：返回影响行数 -->
+        <mxCell id="d9" value="9. affected = 1" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#82b366;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="1040" y="412" as="sourcePoint"/><mxPoint x="865" y="412" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 10. Mapper → Service：返回影响行数（新增中间返回） -->
+        <mxCell id="d10" value="10. 返回 int affectedRows" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#999;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="865" y="445" as="sourcePoint"/><mxPoint x="675" y="445" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 11. Service → Controller：返回业务结果（修复：不再跨层） -->
+        <mxCell id="d11" value="11. 返回 Result{code:200, &quot;删除成功&quot;}" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#999;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="675" y="480" as="sourcePoint"/><mxPoint x="480" y="480" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 12. Controller → 前端：HTTP响应（修复：从Controller发出） -->
+        <mxCell id="d12" value="12. Result{code:200, message:&quot;删除成功&quot;}" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;fontSize=10;strokeColor=#d79b00;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="480" y="515" as="sourcePoint"/><mxPoint x="280" y="515" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 13. 前端 → 用户：UI反馈 -->
+        <mxCell id="d13" value="13. 列表移除 + ElMessage.success(&quot;删除成功&quot;)" style="html=1;verticalAlign=bottom;endArrow=block;fontSize=10;strokeColor=#52c41a;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="280" y="552" as="sourcePoint"/><mxPoint x="105" y="552" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- 注释框 -->
+        <mxCell id="note4" value="设计要点：&#xa;• 软删除 UPDATE status=0&#xa;  非物理 DELETE，保留数据&#xa;• @TableLogic 自动处理：&#xa;  所有查询自动 WHERE status=1&#xa;• 软删除不计入 15 人上限&#xa;  (仅统计 status=1)&#xa;• 跨用户校验 WHERE user_id=?&#xa;• 前端双重确认弹窗" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="72" width="200" height="145" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

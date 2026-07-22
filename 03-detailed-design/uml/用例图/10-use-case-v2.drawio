@@ -1,0 +1,126 @@
+<mxfile host="Electron">
+  <diagram name="用例图" id="4saWpAkySFHfOkLyE0rL">
+    <mxGraphModel dx="1288" dy="903" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=18;fontStyle=1" value="12306旅客管理系统 — 用例图（MVP：乘车人管理 + 车票查询）" vertex="1">
+          <mxGeometry height="30" width="700" x="335" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-user" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=12;fontStyle=1" value="普通用户" vertex="1">
+          <mxGeometry height="80" width="40" x="295" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="system-boundary" parent="1" style="swimlane;startSize=28;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=14;align=center;direction=south;labelPosition=center;verticalLabelPosition=middle;verticalAlign=middle;whiteSpace=wrap;horizontal=1;" value="12306旅客管理系统" vertex="1">
+          <mxGeometry height="680" width="625" x="390" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-t-station" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11" value="车站模糊搜索&#xa;(拼音/中文)" vertex="1">
+          <mxGeometry height="55" width="150" x="42.5" y="600" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-t-query" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11" value="查询车次&#xa;(出发站+到达站+日期)" vertex="1">
+          <mxGeometry height="55" width="155" x="37.5" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-t-filter" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11" value="筛选车次&#xa;(18个筛选参数)" vertex="1">
+          <mxGeometry height="55" width="150" x="37.5" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-t-extend" edge="1" parent="system-boundary" source="uc-t-filter" style="curved=1;rounded=1;jettySize=auto;html=1;dashed=1;dashPattern=8 4;endArrow=open;endFill=0;fontSize=9;fontColor=#666666;exitX=0.5;exitY=1;entryX=0.486;entryY=-0.008;entryDx=0;entryDy=0;entryPerimeter=0;exitDx=0;exitDy=0;" target="uc-t-query" value="«extend»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-t-detail" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11" value="查看车次详情&#xa;(经停站+余票)" vertex="1">
+          <mxGeometry height="55" width="150" x="42.5" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-t-detail-extend" edge="1" parent="system-boundary" source="uc-t-detail" style="curved=1;rounded=1;jettySize=auto;html=1;dashed=1;dashPattern=8 4;endArrow=open;endFill=0;fontSize=9;fontColor=#666666;exitX=0.488;exitY=-0.021;exitDx=0;exitDy=0;exitPerimeter=0;" target="uc-t-query" value="«extend»">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uc-group-t" parent="system-boundary" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=13;fontStyle=1;fontColor=#333333;" value="🎫 车票查询" vertex="1">
+          <mxGeometry height="25" width="130" x="37.5" y="325" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-idtype" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11" value="选择证件类型&#xa;(8种枚举)" vertex="1">
+          <mxGeometry height="55" width="145" x="420" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-group-auth" parent="system-boundary" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=13;fontStyle=1;fontColor=#333333;" value="🔐 用户认证" vertex="1">
+          <mxGeometry height="25" width="120" x="37.5" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-login" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11" value="登录系统" vertex="1">
+          <mxGeometry height="45" width="110" x="175" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-register" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11" value="注册账号" vertex="1">
+          <mxGeometry height="45" width="110" x="47.5" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-p-add" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" value="添加乘车人&#xa;(8种证件类型)" vertex="1">
+          <mxGeometry height="55" width="145" x="230" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-p-include" edge="1" parent="system-boundary" source="uc-p-add" style="curved=1;rounded=1;jettySize=auto;html=1;dashed=1;dashPattern=8 4;endArrow=open;endFill=0;fontSize=9;fontColor=#666666;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="uc-idtype" value="«include»">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-group-p" parent="system-boundary" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=13;fontStyle=1;fontColor=#333333;" value="👥 乘车人管理" vertex="1">
+          <mxGeometry height="25" width="140" x="40" y="145" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-p-list" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" value="查看乘车人列表&#xa;(按首字母分组)" vertex="1">
+          <mxGeometry height="55" width="145" x="55" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-p-edit" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" value="编辑乘车人&#xa;(仅可改旅客类型)" vertex="1">
+          <mxGeometry height="55" width="145" x="55" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-p-delete" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" value="删除乘车人&#xa;(软删除)" vertex="1">
+          <mxGeometry height="55" width="145" x="235" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="sep1" parent="1" style="line;strokeWidth=1;strokeColor=#cccccc;dashed=1;dashPattern=4 4;" value="" vertex="1">
+          <mxGeometry height="1" width="1060" x="170" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-user-register" edge="1" parent="1" source="actor-user" style="entityRelation;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.15;entryX=0;entryY=0.5;" target="uc-register" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-user-login" edge="1" parent="1" source="actor-user" style="entityRelation;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.2;entryX=0;entryY=0.5;" target="uc-login" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-user-p-list" edge="1" parent="1" source="actor-user" style="entityRelation;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.35;entryX=0;entryY=0.5;" target="uc-p-list" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-user-p-add" edge="1" parent="1" source="actor-user" style="entityRelation;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.42;entryX=0;entryY=0.5;" target="uc-p-add" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-user-p-edit" edge="1" parent="1" source="actor-user" style="entityRelation;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.52;entryX=0;entryY=0.5;" target="uc-p-edit" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-user-p-delete" edge="1" parent="1" source="actor-user" style="entityRelation;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.58;entryX=0;entryY=0.5;" target="uc-p-delete" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-user-t-query" edge="1" parent="1" source="actor-user" style="entityRelation;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.7;entryX=0;entryY=0.5;" target="uc-t-query" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-user-t-filter" edge="1" parent="1" source="actor-user" style="entityRelation;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;entryX=0;entryY=0.5;" target="uc-t-filter" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-user-t-detail" edge="1" parent="1" source="actor-user" style="entityRelation;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.82;entryX=0;entryY=0.5;" target="uc-t-detail" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-user-t-station" edge="1" parent="1" source="actor-user" style="entityRelation;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.88;entryX=0;entryY=0.5;" target="uc-t-station" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#999999;dashed=1;dashPattern=5 2;" value="" vertex="1">
+          <mxGeometry height="42" width="600" x="405" y="745" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontSize=11;fontStyle=1;align=left;" value="图例：" vertex="1">
+          <mxGeometry height="18" width="40" x="417" y="752" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-1" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9" value="认证" vertex="1">
+          <mxGeometry height="24" width="60" x="465" y="750" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-2" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=9" value="乘车人" vertex="1">
+          <mxGeometry height="24" width="60" x="535" y="750" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-3" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9" value="车票查询" vertex="1">
+          <mxGeometry height="24" width="70" x="605" y="750" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-4" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9" value="公共/包含" vertex="1">
+          <mxGeometry height="24" width="72" x="685" y="750" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-5" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontSize=9;align=left;" value="— 实线：关联   - - - 虚线：include / extend" vertex="1">
+          <mxGeometry height="18" width="180" x="767" y="752" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

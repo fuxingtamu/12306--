@@ -1,0 +1,101 @@
+// 全局样式
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+// 12306蓝色主题
+$primary-color: #3b99fc;
+$secondary-color: #ff7e00;
+
+// 按钮样式
+.el-button--primary {
+  background-color: $primary-color !important;
+  border-color: $primary-color !important;
+}
+
+// 头部导航样式
+.header {
+  background-color: #fff;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: $primary-color;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 20px;
+  }
+}
+
+// 卡片样式
+.card {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+// 车次列表样式
+.train-item {
+  border-bottom: 1px solid #eee;
+  padding: 15px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .train-info {
+    .train-code {
+      font-size: 18px;
+      font-weight: bold;
+      color: $primary-color;
+    }
+  }
+
+  .seat-info {
+    display: flex;
+    gap: 15px;
+    .seat-type {
+      text-align: center;
+    }
+  }
+}
+
+// 订单状态样式
+.order-status {
+  &.pending {
+    color: #ff7e00;
+  }
+  &.paid {
+    color: #67c23a;
+  }
+  &.cancelled {
+    color: #909399;
+  }
+  &.refunded {
+    color: #f56c6c;
+  }
+}

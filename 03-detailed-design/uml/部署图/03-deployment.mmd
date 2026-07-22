@@ -1,0 +1,72 @@
+%% 部署图：生产环境部署
+graph LR
+
+    subgraph "用户终端"
+        BROWSER["Chrome/Firefox/Safari"]
+        PHONE["iOS/Android App"]
+    end
+
+    subgraph "CDN网络"
+        CDN["阿里云CDN"]
+    end
+
+    subgraph "负载均衡集群"
+        LB["SLB负载均衡"]
+        NG1["Nginx-1"]
+        NG2["Nginx-2"]
+    end
+
+    subgraph "应用集群 - Kubernetes"
+        subgraph "Frontend Pods"
+            FE1["Vue3 Pod-1"]
+            FE2["Vue3 Pod-2"]
+        end
+
+        subgraph "Backend Pods"
+            API1["API Pod-1"]
+            API2["API Pod-2"]
+            API3["API Pod-3"]
+        end
+
+        subgraph "Data Pods"
+            DB1["MySQL Primary"]
+            DB2["MySQL Replica"]
+            RD1["Redis Master"]
+            RD2["Redis Slave"]
+        end
+    end
+
+    subgraph "外部服务"
+        OSS["阿里云OSS"]
+        SMS["短信服务"]
+        PAY["支付网关"]
+    end
+
+    %% 连接
+    BROWSER --> CDN
+    PHONE --> CDN
+    CDN --> LB
+    LB --> NG1
+    LB --> NG2
+    NG1 --> FE1
+    NG1 --> FE2
+    NG2 --> FE1
+    NG2 --> FE2
+    FE1 --> API1
+    FE2 --> API2
+    API1 --> API3
+    API3 --> DB1
+    API3 --> DB2
+    API3 --> RD1
+    API3 --> RD2
+    API1 --> OSS
+    API1 --> SMS
+    API2 --> PAY
+
+    %% 样式
+    style CDN fill:#e8f5e9
+    style LB fill:#fff8e1
+    style FE1,FE2 fill:#e3f2fd
+    style API1,API2,API3 fill:#e8f5e9
+    style DB1,DB2 fill:#f3e5f5
+    style RD1,RD2 fill:#ffebee
